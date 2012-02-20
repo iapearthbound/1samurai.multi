@@ -1,0 +1,34 @@
+##############################################################
+#		     	    Change Log		  	     #
+##############################################################
+
+INITRAM :	MIUI
+
+RECOVERY:	MIUI
+
+KERNEL  :	MIUI
+
+CPU Freq:	100/200/400/600/800/900/1.1/1.2/1.3/1.4/1.5
+
+GPU	:	GPU Overclocking +200MHz -100MHz
+
+GOVs    :	Scary/Wheatley/Smoothass/Samurai/intellidemand/savagedZen
+		/smartassv2/smartass/interactivex/interactive/conservative
+		/ondemand/userspace/powersave/lagfree/performance
+
+I/O     :	noop/deadline/cfq/bfq/sio/vr
+I/O     :	tweaked I/O schedulers for flash based deices
+
+COLOR   : 	Voodoo color 			<-(bbelos)
+SOUND   : 	Voodoo sound 			<-(earthbound.iap)
+DOCK    :	Dock Audio Support		<-(bbelos)
+RNDIS   :	RNDIS for Linux			<-(bbelos)
+REBOOT  :	3-Finger-Reboot			<-(nubecoder)
+SUPPORT :	TUN-CIFS-FUSE-TCPMSS Support	<-(mkasick)
+BOOTFREQ:	Safe-min/max on boot 100/1000
+POWER   :	Power suspend cpu freq 		<-(nubecoder)
+FPS     :	upped cap from 60Hz to 72Hz
+LOWMEM  :	Low Memory dead lock
+MEM     :	erase memory pages when they are freed
+CPUIDLE :	fixed wrapping timers
+ARM     :	free allocated page if unable to map  <-(russel king)
