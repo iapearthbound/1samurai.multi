@@ -3,9 +3,9 @@
 TARGET_LOCALE="vzw"
 
 # define envvars
-KBUILD_BUILD_VERSION="SAMURAI.TANTO"
-LOCALVERSION=".SAMURAI.TANTO"
-CODENAME="TANTO"
+KBUILD_BUILD_VERSION="SAMURAI.DAITO"
+LOCALVERSION=".SAMURAI.DAITO"
+CODENAME="DAITO"
 
 # define vars
 DATE=$(date +%m.%d.%H.%M)
@@ -176,6 +176,30 @@ source $PWD/functions
       KERNEL_INITRD="$KERNEL_BUILD_DIR/usr/initramfs_cm9"
       BUILD_OUT="$PWD/out/cm9_out"
       BUILD_PLATFORM="CM9.MTD"
+      ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
+    #BUILD Layout
+      VARIABLES
+      MAKE_CLEAN
+      #BUILD_MODULE
+      CLEAN_ZIMAGE
+      START_TIME=`date +%s`
+      BUILD_KERNEL
+      PACKAGE_BOOTIMG_CM9
+      UPDATE_CWMSCRIPT
+      PACKAGE_MTD_CWMFLASHABLE
+      tput setaf 2
+      read -p "Press [Enter] key to continue..."
+      ./build_kernel.sh
+    ;;
+  #Compile Kernel for CM9 MTD
+    "m4" )
+    #Platform Specific Variables
+      DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+      KERNEL_BUILD_DIR="$PWD/Kernel/cm9"
+      RECOVERY_INITRD="$PWD/recovery/recovery_cm9"
+      KERNEL_INITRD="$KERNEL_BUILD_DIR/usr/initramfs_cm9"
+      BUILD_OUT="$PWD/out/miuiv4_out"
+      BUILD_PLATFORM="MIUI.v4"
       ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
     #BUILD Layout
       VARIABLES
