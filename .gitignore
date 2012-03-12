@@ -20,7 +20,6 @@ boot_zImage.zip
 *.tmp_versions/
 *.tmp_vmlinux1
 *.tmp_vmlinux2
-*.version
 *.symvers
 *.map
 *Image
