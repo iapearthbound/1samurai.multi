@@ -20,6 +20,7 @@ boot_zImage.zip
 *.tmp_versions/
 *.tmp_vmlinux1
 *.tmp_vmlinux2
+*.version
 *.symvers
 *.map
 *Image
@@ -53,7 +54,6 @@ Kernel/cm9/include/config/
 Kernel/cm7_miui/include/config/
 Kernel/cm9/include/generated/
 Kernel/cm7_miui/include/generated/
-*version.h
 *bounds.s
 *config_data.gz
 *config_data.h
