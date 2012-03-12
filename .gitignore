@@ -24,7 +24,6 @@ boot_zImage.zip
 *.symvers
 *.map
 *Image
-*lib1funcs.S
 *piggy.gzip
 *vmlinux
 *vmlinux.lds
