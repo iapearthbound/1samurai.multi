@@ -71,6 +71,6 @@ sleep(1);
 	ui_print("");
 	ui_print("KERNEL: SAMURAI");
         ui_print("CODE NAME: CM9.MTD.DAITO");
-        ui_print("COMPILED ON: Sat.Mar.10.2012.08:08:57.PM");
+        ui_print("COMPILED ON: Sat.Mar.10.2012.08:56:43.PM");
 	ui_print("CREATED BY: EarthBound.IAP");
 show_progress(0.100000, 0);

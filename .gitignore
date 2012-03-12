@@ -8,7 +8,6 @@
 *.orig
 *.rej
 *.patch
-*cpufreq_samurai.c
 tools/kexec-cwm-test-zip/META-INF/com/google/android/update-binary
 tools/kexec-cwm-test-zip/zImage
 boot_zImage.zip
