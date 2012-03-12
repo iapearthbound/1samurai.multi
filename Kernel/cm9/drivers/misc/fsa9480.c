@@ -110,6 +110,10 @@
 #define INT_DETACH		(1 << 1)
 #define INT_ATTACH		(1 << 0)
 
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+extern void set_otghost_mode(int mode);
+#endif
+
 #define USB_CABLE_50K   1
 #define USB_CABLE_255K  2
 #define CABLE_DISCONNECT        0
@@ -117,6 +121,10 @@
 #define DRIVER_NAME		"usb_configuration"
 #define WIMAX_CABLE_50K       1553
 #define WIMAX_CABLE_50K_DIS   1567
+
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+extern void set_otghost_mode(int mode);
+#endif
 
 struct fsa9480_usbsw {
 	struct i2c_client		*client;
@@ -504,6 +512,16 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw)
 					dev_err(&client->dev,
 						"%s: err %d\n", __func__, ret);
 			}
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+// sztupy: handle automatic otg switching
+                       if (val1 & DEV_USB_OTG) {
+                               // otg cable detected
+                               set_otghost_mode(2);
+                       } else {
+                               // client cable detected
+                               set_otghost_mode(1);
+                       }
+#endif
 #ifdef CONFIG_MACH_VICTORY
 		} else if ( val2 & DEV_T2_USB_MASK ) {
 			if (pdata->wimax_cb)
@@ -598,6 +616,10 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw)
 			UsbIndicator(0);
 			if (pdata->usb_cb)
 				pdata->usb_cb(FSA9480_DETACHED);
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+                               // sztupy: also switch off otg host mode
+                               set_otghost_mode(0);
+#endif
 #ifdef CONFIG_MACH_VICTORY		
         	/* USB JIG */
 		} else if (usbsw->dev2 & DEV_T2_USB_MASK) {

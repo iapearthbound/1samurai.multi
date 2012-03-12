@@ -80,6 +80,7 @@ enum {
 	AUTH_BATTERY,	// Returns valid result if __VZW_AUTH_CHECK__ is defined.
 	BATT_CHG_CURRENT_AVER,
 	BATT_TYPE,
+	DISABLE_CHARGER,
 #ifdef __SOC_TEST__
 	SOC_TEST,
 #endif

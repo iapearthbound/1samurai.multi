@@ -345,7 +345,7 @@ static struct s3cfb_lcd nt35580 = {
 	.p_width = 52,
 	.p_height = 86,
 	.bpp = 24,
-	.freq = 60,
+	.freq = 72,
 	.timing = {
 		.h_fp = 10,
 		.h_bp = 20,
@@ -367,17 +367,13 @@ static struct s3cfb_lcd nt35580 = {
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (12288 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (9900 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (12288 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (13312 * SZ_1K) // 13MB
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (21504 * SZ_1K) // 21MB
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (24064 * SZ_1K) // 23.5MB
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (24064 * SZ_1K) // 23.5MB
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMD (800 * 480 * 4 * \
 		(CONFIG_FB_S3C_NR_BUFFERS + \
 		(CONFIG_FB_S3C_NUM_OVLY_WIN * \
 		 CONFIG_FB_S3C_NUM_BUF_OVLY_WIN)))
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (5012 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_PMEM (5550 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_GPU1 (3300 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_ADSP (1500 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_TEXTSTREAM  (3000 * SZ_1K)
 static struct s5p_media_device victory_media_devs[] = {
 	[0] = {
 		.id = S5P_MDEV_FIMD,
@@ -428,34 +424,6 @@ static struct s5p_media_device victory_media_devs[] = {
 		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG,
 		.paddr = 0,
 	},
-	[7] = {
-		.id = S5P_MDEV_PMEM,
-		.name = "pmem",
-		.bank = 0,
-		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_PMEM,
-		.paddr = 0,
-	},
-	[8] = {
-		.id = S5P_MDEV_PMEM_GPU1,
-		.name = "pmem_gpu1",
-		.bank = 0,
-		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_GPU1,
-		.paddr = 0,
-	},	
-	[9] = {
-		.id = S5P_MDEV_PMEM_ADSP,
-		.name = "pmem_adsp",
-		.bank = 0,
-		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_ADSP,
-		.paddr = 0,
-	},		
-        [10] = {
-                .id = S5P_MDEV_TEXSTREAM,
-                .name = "s3c_bc",
-                .bank = 1,
-                .memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_TEXTSTREAM,
-                .paddr = 0,
-        },
 };
 
 static struct regulator_consumer_supply ldo3_consumer[] = {
@@ -1178,7 +1146,7 @@ static struct s3cfb_lcd s6e63m0 = {
 	.p_width = 52,
 	.p_height = 86,
 	.bpp = 24,
-	.freq = 60,
+	.freq = 72,
 
 	.timing = {
 		.h_fp = 16,
@@ -3220,6 +3188,9 @@ static struct platform_device *victory_devices[] __initdata = {
 	&s3c_device_i2c9,  /* max1704x:fuel_guage */
 	&s3c_device_i2c11, /* optical sensor */
 	&s3c_device_i2c12, /* MAX8893 PMIC */
+#ifdef CONFIG_USB_S3C_OTG_HOST
+       &s3c_device_usb_otghcd,
+#endif
 #ifdef CONFIG_USB_GADGET
 	&s3c_device_usbgadget,
 #endif
@@ -3587,10 +3558,10 @@ void otg_phy_init(void)
 			S3C_USBOTG_PHYCLK);
 	writel((readl(S3C_USBOTG_RSTCON) & ~(0x3<<1)) | (0x1<<0),
 			S3C_USBOTG_RSTCON);
-	msleep(1);
+	mdelay(1);
 	writel(readl(S3C_USBOTG_RSTCON) & ~(0x7<<0),
 			S3C_USBOTG_RSTCON);
-	msleep(1);
+	mdelay(1);
 
 	/* rising/falling time */
 	writel(readl(S3C_USBOTG_PHYTUNE) | (0x1<<20),
@@ -3647,6 +3618,44 @@ void usb_host_phy_off(void)
 			S5P_USB_PHY_CONTROL);
 }
 EXPORT_SYMBOL(usb_host_phy_off);
+#endif
+
+#ifdef CONFIG_USB_S3C_OTG_HOST
+
+/* Initializes OTG Phy */
+void otg_host_phy_init(void)
+{
+       __raw_writel(__raw_readl(S5P_USB_PHY_CONTROL)
+               |(0x1<<0), S5P_USB_PHY_CONTROL); /*USB PHY0 Enable */
+// from galaxy tab otg host:
+//     __raw_writel((__raw_readl(S3C_USBOTG_PHYPWR)
+//             &~(0x3<<3)&~(0x1<<0))|(0x1<<5), S3C_USBOTG_PHYPWR);
+// from galaxy s2 otg host:
+        __raw_writel((__raw_readl(S3C_USBOTG_PHYPWR)
+               &~(0x7<<3)&~(0x1<<0)), S3C_USBOTG_PHYPWR);
+       __raw_writel((__raw_readl(S3C_USBOTG_PHYCLK)
+               &~(0x1<<4))|(0x7<<0), S3C_USBOTG_PHYCLK);
+
+       __raw_writel((__raw_readl(S3C_USBOTG_RSTCON)
+               &~(0x3<<1))|(0x1<<0), S3C_USBOTG_RSTCON);
+       mdelay(1);
+       __raw_writel((__raw_readl(S3C_USBOTG_RSTCON)
+               &~(0x7<<0)), S3C_USBOTG_RSTCON);
+       mdelay(1);
+
+       __raw_writel((__raw_readl(S3C_UDC_OTG_GUSBCFG)
+               |(0x3<<8)), S3C_UDC_OTG_GUSBCFG);
+
+//     smb136_set_otg_mode(1);
+
+       printk("otg_host_phy_int : USBPHYCTL=0x%x,PHYPWR=0x%x,PHYCLK=0x%x,USBCFG=0x%x\n",
+               readl(S5P_USB_PHY_CONTROL),
+               readl(S3C_USBOTG_PHYPWR),
+               readl(S3C_USBOTG_PHYCLK),
+               readl(S3C_UDC_OTG_GUSBCFG)
+               );
+}
+EXPORT_SYMBOL(otg_host_phy_init);
 #endif
 
 void s3c_setup_uart_cfg_gpio(unsigned char port)

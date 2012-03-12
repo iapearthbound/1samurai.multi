@@ -1,55 +1,11 @@
 --- drivers/misc/fsa9480.c
 +++ drivers/misc/fsa9480.c
-@@ -545,7 +545,7 @@
- 				dock_status = 1;
- 			
- 			ret = i2c_smbus_write_byte_data(client,
--					FSA9480_REG_MANSW1, SW_DHOST);
-+					FSA9480_REG_MANSW1, SW_VAUDIO);
- 			if (ret < 0)
- 				dev_err(&client->dev,
- 					"%s: err %d\n", __func__, ret);
-@@ -566,6 +566,24 @@
- 			if (pdata->cardock_cb)
- 				pdata->cardock_cb(FSA9480_ATTACHED);
- 			dock_status = 1;
-+
-+                        ret = i2c_smbus_write_byte_data(client,
-+                                        FSA9480_REG_MANSW1, SW_VAUDIO);
-+                        if (ret < 0)
-+                                dev_err(&client->dev,
-+                                        "%s: err %d\n", __func__, ret);
-+
-+                        ret = i2c_smbus_read_byte_data(client,
-+                                        FSA9480_REG_CTRL);
-+                        if (ret < 0)
-+                                dev_err(&client->dev,
-+                                        "%s: err %d\n", __func__, ret);
-+
-+                        ret = i2c_smbus_write_byte_data(client,
-+                                FSA9480_REG_CTRL, ret & ~CON_MANUAL_SW);
-+                        if (ret < 0)
-+                                dev_err(&client->dev,
-+                                        "%s: err %d\n", __func__, ret);
- 		}
- 	/* Detached */
- 	} else {
-@@ -628,6 +646,18 @@
- 			if (pdata->cardock_cb)
- 				pdata->cardock_cb(FSA9480_DETACHED);
- 			dock_status = 0;
-+
-+                        ret = i2c_smbus_read_byte_data(client,
-+                                        FSA9480_REG_CTRL);
-+                        if (ret < 0)
-+                                dev_err(&client->dev,
-+                                        "%s: err %d\n", __func__, ret);
-+
-+                        ret = i2c_smbus_write_byte_data(client,
-+                                        FSA9480_REG_CTRL, ret | CON_MANUAL_SW);
-+                        if (ret < 0)
-+                                dev_err(&client->dev,
-+                                        "%s: err %d\n", __func__, ret);
- 		}
- 	}
- 
+@@ -416,7 +416,7 @@
+ 				pdata->usb_cb(FSA9480_DETACHED);
+ 				}
+ #endif
+-#ifdef CONFIG_USB_S3C_OTG_HOST
++#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+                                // sztupy: also switch off otg host mode
+                                set_otghost_mode(0);
+ #endif

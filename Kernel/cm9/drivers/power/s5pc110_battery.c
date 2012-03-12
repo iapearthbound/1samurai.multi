@@ -148,6 +148,7 @@ struct chg_data {
 static struct chg_data *pchg = NULL;	// pointer to chg initialized in probe function
 
 static bool lpm_charging_mode;
+static bool disable_charger;
 
 static char *supply_list[] = {
 	"battery",
@@ -199,6 +200,7 @@ static struct device_attribute s3c_battery_attrs[] = {
         SEC_BATTERY_ATTR(auth_battery),	// Returns valid result if __VZW_AUTH_CHECK__ is defined.
         SEC_BATTERY_ATTR(batt_chg_current_aver),
 	SEC_BATTERY_ATTR(batt_type), //to check only
+	SEC_BATTERY_ATTR(disable_charger),
 #ifdef __SOC_TEST__
         SEC_BATTERY_ATTR(soc_test),
 #endif
@@ -1015,7 +1017,7 @@ static int s3c_cable_status_update(struct chg_data *chg)
 			power_supply_changed(&chg->psy_usb);
 		}
 
-		if (chg->bat_info.dis_reason) {
+		if (chg->bat_info.dis_reason || disable_charger) {
 			/* have vdcin, but cannot charge */
 			chg->charging = 0;
 			ret = max8998_charging_control(chg);
@@ -1312,6 +1314,9 @@ static ssize_t s3c_bat_show_attrs(struct device *dev,
 	case BATT_TYPE:
 		i += scnprintf(buf + i, PAGE_SIZE - i, "SDI_SDI\n");
 		break;
+	case DISABLE_CHARGER:
+    		i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n", disable_charger);
+    		break;
 #ifdef __SOC_TEST__
         case SOC_TEST:
                 i += scnprintf(buf + i, PAGE_SIZE - i, "%d\n",
@@ -1393,6 +1398,12 @@ static ssize_t s3c_bat_store_attrs(struct device *dev, struct device_attribute *
 			ret = count;
 		}
 		break;
+case DISABLE_CHARGER:
+if (sscanf(buf, "%d\n", &x) == 1) {
+disable_charger = x;
+ret = count;
+}
+break;
 #ifdef __SOC_TEST__
         case SOC_TEST:
                 if (sscanf(buf, "%d\n", &x) == 1) {
@@ -1689,6 +1700,8 @@ static __devinit int max8998_charger_probe(struct platform_device *pdev)
 	}
 
 	check_lpm_charging_mode(chg);
+
+	disable_charger = 0;
 
 	/* init power supplier framework */
 	ret = power_supply_register(&pdev->dev, &chg->psy_bat);
