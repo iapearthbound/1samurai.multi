@@ -1,0 +1,106 @@
+From 338010ef3b0012eb5f5db56c9110e41967f222d1 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sun, 5 Feb 2012 16:23:40 -0500
+Subject: [PATCH 29/35] ADJUST: Lagfree Governor <-(earthbound.iap)
+
+
+diff --git a/Kernel/drivers/cpufreq/Kconfig b/Kernel/drivers/cpufreq/Kconfig
+index ec09f0b..1a1bd42 100644
+--- a/Kernel/drivers/cpufreq/Kconfig
++++ b/Kernel/drivers/cpufreq/Kconfig
+@@ -364,6 +364,12 @@ config CPU_FREQ_GOV_INTELLIDEMAND
+         help
+           'intellidemand' - an intelligent ondemand governor
+ 
++config CPU_FREQ_GOV_SMOOTHASS
++	tristate "'smoothass' governor"
++	depends on CPU_FREQ
++	help
++	  Slightly more aggressive smartass
++
+ config CPU_FREQ_GOV_LAGFREE
+         tristate "'lagfree' cpufreq governor"
+         depends on CPU_FREQ
+@@ -371,33 +377,62 @@ config CPU_FREQ_GOV_LAGFREE
+           'lagfree' - this driver is rather similar to the 'ondemand'
+           governor both in its source code and its purpose, the difference is
+           its optimisation for better suitability in a battery powered
+-          environment. The frequency is gracefully increased and decreased
++          environment.  The frequency is gracefully increased and decreased
+           rather than jumping to 100% when speed is required.
+ 
+-          To compile this driver as a module, choose M here: the
+-          module will be called cpufreq_lagfree.
+-          For details, take a look at linux/Documentation/cpu-freq.
+-          If in doubt, say N.
++config LAGFREE_MAX_LOAD
++	int "Max CPU Load"
++	default 50
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  CPU freq will be increased if measured load > max_cpu_load;
++
++config LAGFREE_MIN_LOAD
++	int "Min CPU Load"
++	default 15
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  CPU freq will be decrease if measured load < min_cpu_load;
++
++config LAGFREE_FREQ_STEP_DOWN
++	int "Frequency Step Down"
++	default 100000
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  Max freqeuncy delta when ramping down.
++
++config LAGFREE_FREQ_SLEEP_MAX
++	int "Max Sleep frequeny"
++	default 400000
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  Max freqeuncy for screen off.
++
++config LAGFREE_FREQ_AWAKE_MIN
++	int "Min Awake frequeny"
++	default 200000
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  Min freqeuncy for screen on.
++
++config LAGFREE_FREQ_STEP_UP_SLEEP_PERCENT
++	int "Freq step up percent sleep"
++	default 20
++	depends on CPU_FREQ_GOV_LAGFREE
++	help
++	  Frequency percent to step up while screen off.
+ 
+ config CPU_FREQ_MIN_TICKS
+-  	int "Ticks between governor polling interval."
+-  	depends on CPU_FREQ_GOV_LAGFREE
+-  	default 10
+-  	help
+-    	  Minimum number of ticks between polling interval for governors.
++	int "Ticks between governor polling interval."
++	default 10
++	help
++	  Minimum number of ticks between polling interval for governors.
+ 
+ config CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER
+ 	int "Sampling rate multiplier for governors."
+-	depends on CPU_FREQ_GOV_LAGFREE
+ 	default 1000
+ 	help
+ 	  Sampling latency rate multiplied by the cpu switch latency.
+ 	  Affects governor polling.
+ 
+-config CPU_FREQ_GOV_SMOOTHASS
+-	tristate "'smoothass' governor"
+-	depends on CPU_FREQ
+-	help
+-	  Slightly more aggressive smartass
+-
+ endif	# CPU_FREQ
+-- 
+1.7.5.4
+

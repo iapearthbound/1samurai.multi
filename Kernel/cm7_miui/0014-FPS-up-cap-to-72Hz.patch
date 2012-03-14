@@ -1,0 +1,31 @@
+From d8f7d01cc0a6408fcf2a8d04ad0df8fd8bc34eb0 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 14:41:53 -0500
+Subject: [PATCH 14/35] FPS: up cap to 72Hz
+
+
+diff --git a/Kernel/arch/arm/mach-s5pv210/mach-victory.c b/Kernel/arch/arm/mach-s5pv210/mach-victory.c
+index 509e312..a18b5ce 100644
+--- a/Kernel/arch/arm/mach-s5pv210/mach-victory.c
++++ b/Kernel/arch/arm/mach-s5pv210/mach-victory.c
+@@ -345,7 +345,7 @@ static struct s3cfb_lcd nt35580 = {
+ 	.p_width = 52,
+ 	.p_height = 86,
+ 	.bpp = 24,
+-	.freq = 60,
++	.freq = 72,
+ 	.timing = {
+ 		.h_fp = 10,
+ 		.h_bp = 20,
+@@ -1178,7 +1178,7 @@ static struct s3cfb_lcd s6e63m0 = {
+ 	.p_width = 52,
+ 	.p_height = 86,
+ 	.bpp = 24,
+-	.freq = 60,
++	.freq = 72,
+ 
+ 	.timing = {
+ 		.h_fp = 16,
+-- 
+1.7.5.4
+

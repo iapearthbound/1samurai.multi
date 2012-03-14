@@ -1,0 +1,232 @@
+From c4119ce9e2bdba369bb6d4aa1fd3178c9e9ca869 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 09:43:08 -0500
+Subject: [PATCH 04/35] Voodoo Sound <-(earthbound+zman0900)
+
+
+diff --git a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+index 690e920..d2dc5eb 100644
+--- a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
++++ b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+@@ -1636,6 +1636,11 @@ CONFIG_SND_SOC_WM_HUBS=y
+ CONFIG_SND_SOC_WM8994=y
+ # CONFIG_SND_SOC_WM8994_ATLAS is not set
+ CONFIG_SND_SOC_WM8994_VICTORY=y
++CONFIG_SND_VOODOO=y
++CONFIG_SND_VOODOO_HP_LEVEL_CONTROL=y
++CONFIG_SND_VOODOO_HP_LEVEL=47
++CONFIG_SND_VOODOO_RECORD_PRESETS=y
++# CONFIG_SND_VOODOO_DEVELOPMENT is not set
+ # CONFIG_SOUND_PRIME is not set
+ # CONFIG_SND_S5P_RP is not set
+ # CONFIG_HID_SUPPORT is not set
+diff --git a/Kernel/sound/soc/Kconfig b/Kernel/sound/soc/Kconfig
+index b1749bc..593d6e7 100644
+--- a/Kernel/sound/soc/Kconfig
++++ b/Kernel/sound/soc/Kconfig
+@@ -39,6 +39,7 @@ source "sound/soc/txx9/Kconfig"
+ 
+ # Supported codecs
+ source "sound/soc/codecs/Kconfig"
++source "sound/soc/codecs/Kconfig.voodoo"
+ 
+ endif	# SND_SOC
+ 
+diff --git a/Kernel/sound/soc/codecs/Makefile b/Kernel/sound/soc/codecs/Makefile
+index fa2248c..a15b415 100644
+--- a/Kernel/sound/soc/codecs/Makefile
++++ b/Kernel/sound/soc/codecs/Makefile
+@@ -51,8 +51,12 @@ snd-soc-wm8988-objs := wm8988.o
+ snd-soc-wm8990-objs := wm8990.o
+ snd-soc-wm8993-objs := wm8993.o
+ ifeq ($(CONFIG_SND_SOC_WM8994_VICTORY),y)
++ifeq ($(CONFIG_SND_VOODOO),y)
++snd-soc-wm8994-objs := wm8994_samsung.o wm8994_aries.o wm8994_voodoo.o
++else
+ snd-soc-wm8994-objs := wm8994_samsung.o wm8994_aries.o
+ endif
++endif
+ ifeq ($(CONFIG_SND_SOC_WM8994_ATLAS),y)
+ ifeq ($(CONFIG_S5PV210_GARNETT_DELTA),y)
+ snd-soc-wm8994-objs := garnett/wm8994_samsung.o garnett/wm8994_aries.o
+diff --git a/Kernel/sound/soc/codecs/victory/wm8994_aries.c b/Kernel/sound/soc/codecs/victory/wm8994_aries.c
+index b0528ee..7d387e8 100644
+--- a/Kernel/sound/soc/codecs/victory/wm8994_aries.c
++++ b/Kernel/sound/soc/codecs/victory/wm8994_aries.c
+@@ -20,6 +20,9 @@
+ #include <plat/map-base.h>
+ #include <mach/regs-clock.h>
+ #include "wm8994_samsung.h"
++#ifdef CONFIG_SND_VOODOO
++#include "wm8994_voodoo.h"
++#endif
+ 
+ /*
+  * Debug Feature
+@@ -1181,6 +1184,9 @@ void wm8994_record_headset_mic(struct snd_soc_codec *codec)
+ 	else
+ 		wm8994_set_codec_gain(codec, RECORDING_MODE, RECORDING_HP);
+ 
++#ifdef CONFIG_SND_VOODOO_RECORD_PRESETS
++	voodoo_hook_record_main_mic();
++#endif
+ }
+ 
+ void wm8994_record_main_mic(struct snd_soc_codec *codec)
+@@ -1323,6 +1329,9 @@ void wm8994_record_main_mic(struct snd_soc_codec *codec)
+ 				/****************DRC END************************/
+ 			}
+ 
++#ifdef CONFIG_SND_VOODOO_RECORD_PRESETS
++	voodoo_hook_record_main_mic();
++#endif
+ }
+ 
+ void wm8994_record_bluetooth(struct snd_soc_codec *codec)
+@@ -1817,6 +1826,10 @@ void wm8994_set_playback_speaker(struct snd_soc_codec *codec)
+ 	val |= WM8994_AIF1DAC1L_TO_DAC1L;
+ 	wm8994_write(codec, WM8994_DAC1_LEFT_MIXER_ROUTING, val);
+ 
++#ifdef CONFIG_SND_VOODOO
++  voodoo_hook_playback_speaker();
++#endif
++
+ 	//Enbale bias,vmid and Left speaker
+ 	val = wm8994_read(codec,WM8994_POWER_MANAGEMENT_1);
+ 	val &= ~(WM8994_BIAS_ENA_MASK | WM8994_VMID_SEL_MASK |WM8994_HPOUT1L_ENA_MASK |WM8994_HPOUT1R_ENA_MASK |
+diff --git a/Kernel/sound/soc/codecs/victory/wm8994_samsung.c b/Kernel/sound/soc/codecs/victory/wm8994_samsung.c
+index ed6d9bb..0d786da 100644
+--- a/Kernel/sound/soc/codecs/victory/wm8994_samsung.c
++++ b/Kernel/sound/soc/codecs/victory/wm8994_samsung.c
+@@ -40,6 +40,10 @@
+ #include <plat/gpio-cfg.h>
+ #include <mach/regs-clock.h>
+ #include "wm8994_samsung.h"
++#ifdef CONFIG_SND_VOODOO
++#include "wm8994_voodoo.h"
++#endif
++
+ #ifdef FEATURE_SS_AUDIO_CAL
+ #include <linux/proc_fs.h>
+ #include <linux/sec_jack.h>
+@@ -470,6 +474,11 @@ int wm8994_write(struct snd_soc_codec *codec, unsigned int reg,
+ 	 * D15..D9 WM8993 register offset
+ 	 * D8...D0 register data
+ 	 */
++
++#ifdef CONFIG_SND_VOODOO
++	value = voodoo_hook_wm8994_write(codec, reg, value);
++#endif
++
+ 	data[0] = (reg & 0xff00) >> 8;
+ 	data[1] = reg & 0x00ff;
+ 	data[2] = value >> 8;
+@@ -3636,6 +3645,11 @@ static int wm8994_i2c_probe(struct i2c_client *i2c,
+ 	control_data1 = i2c;
+ 
+ 	ret = wm8994_init(wm8994_priv, pdata);
++
++#ifdef CONFIG_SND_VOODOO
++	voodoo_hook_wm8994_pcm_probe(codec);
++#endif
++
+ 	if (ret) {
+ 		dev_err(&i2c->dev, "failed to initialize WM8994\n");
+ 		goto err_init;
+diff --git a/Kernel/sound/soc/codecs/wm8994.h b/Kernel/sound/soc/codecs/wm8994.h
+index 13257dc..b665d47 100644
+--- a/Kernel/sound/soc/codecs/wm8994.h
++++ b/Kernel/sound/soc/codecs/wm8994.h
+@@ -10,6 +10,8 @@
+ #define _WM8994_H
+ 
+ #include <sound/soc.h>
++#include "wm8994_voodoo.h"
++
+ 
+ extern struct snd_soc_codec_device soc_codec_dev_wm8994;
+ // We don't use array	- DW Shim.
+diff --git a/Kernel/sound/soc/codecs/wm8994_aries.c b/Kernel/sound/soc/codecs/wm8994_aries.c
+index 88b73a2..c93de2a 100644
+--- a/Kernel/sound/soc/codecs/wm8994_aries.c
++++ b/Kernel/sound/soc/codecs/wm8994_aries.c
+@@ -20,6 +20,9 @@
+ #include <plat/map-base.h>
+ #include <mach/regs-clock.h>
+ #include "wm8994_samsung.h"
++#ifdef CONFIG_SND_VOODOO 
++#include "wm8994_voodoo.h" 
++#endif 
+ 
+ /*
+  * Debug Feature
+@@ -1142,6 +1145,9 @@ void wm8994_record_headset_mic(struct snd_soc_codec *codec)
+ 	else
+ 		wm8994_set_codec_gain(codec, RECORDING_MODE, RECORDING_HP);
+ 
++#ifdef CONFIG_SND_VOODOO_RECORD_PRESETS
++  voodoo_hook_record_main_mic();
++#endif
+ }
+ 
+ void wm8994_record_main_mic(struct snd_soc_codec *codec)
+@@ -1252,6 +1258,9 @@ void wm8994_record_main_mic(struct snd_soc_codec *codec)
+ 	else
+ 		wm8994_set_codec_gain(codec, RECORDING_MODE, RECORDING_MAIN);
+ 
++#ifdef CONFIG_SND_VOODOO_RECORD_PRESETS 
++  voodoo_hook_record_main_mic(); 
++#endif 
+ }
+ 
+ void wm8994_record_bluetooth(struct snd_soc_codec *codec)
+@@ -1683,6 +1692,10 @@ void wm8994_set_playback_speaker(struct snd_soc_codec *codec)
+ 	val |= WM8994_AIF1DAC1L_TO_DAC1L;
+ 	wm8994_write(codec, WM8994_DAC1_LEFT_MIXER_ROUTING, val);
+ 
++#ifdef CONFIG_SND_VOODOO
++  voodoo_hook_playback_speaker();
++#endif
++
+ 	/* Enbale bias,vmid and Left speaker */
+ 	val = wm8994_read(codec, WM8994_POWER_MANAGEMENT_1);
+ 	val &= ~(WM8994_BIAS_ENA_MASK | WM8994_VMID_SEL_MASK |
+diff --git a/Kernel/sound/soc/codecs/wm8994_samsung.c b/Kernel/sound/soc/codecs/wm8994_samsung.c
+index f1e87bf..261c95d 100644
+--- a/Kernel/sound/soc/codecs/wm8994_samsung.c
++++ b/Kernel/sound/soc/codecs/wm8994_samsung.c
+@@ -40,6 +40,10 @@
+ #include <plat/gpio-cfg.h>
+ #include <mach/regs-clock.h>
+ #include "wm8994_samsung.h"
++#ifdef CONFIG_SND_VOODOO
++#include "wm8994_voodoo.h"
++#endif
++
+ #ifdef FEATURE_SS_AUDIO_CAL
+ #include <linux/proc_fs.h>
+ #include <linux/sec_jack.h>
+@@ -462,6 +466,10 @@ int wm8994_write(struct snd_soc_codec *codec, unsigned int reg,
+ 	u8 data[4];
+ 	int ret;
+ 
++#ifdef CONFIG_SND_VOODOO
++  value = voodoo_hook_wm8994_write(codec, reg, value);
++#endif
++
+ 	/* data is
+ 	 * D15..D9 WM8993 register offset
+ 	 * D8...D0 register data
+@@ -3371,6 +3379,9 @@ static int wm8994_i2c_probe(struct i2c_client *i2c,
+ 	control_data1 = i2c;
+ 
+ 	ret = wm8994_init(wm8994_priv, pdata);
++#ifdef CONFIG_SND_VOODOO
++  voodoo_hook_wm8994_pcm_probe(codec);
++#endif
+ 	if (ret) {
+ 		dev_err(&i2c->dev, "failed to initialize WM8994\n");
+ 		goto err_init;
+-- 
+1.7.5.4
+

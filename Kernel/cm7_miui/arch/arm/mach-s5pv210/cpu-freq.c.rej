@@ -1,0 +1,68 @@
+--- arch/arm/mach-s5pv210/cpu-freq.c
++++ arch/arm/mach-s5pv210/cpu-freq.c
+@@ -51,15 +51,41 @@
+ static DEFINE_MUTEX(set_freq_lock);
+ 
+ /* frequency */
+-static struct cpufreq_frequency_table freq_table[] = {
+-	{L0, 1000*1000},
+-	{L1, 800*1000},
+-	{L2, 400*1000},
+-	{L3, 200*1000},
+-	{L4, 100*1000},
++static struct cpufreq_frequency_table freq_table[NUM_FREQ + 1] = {
++	{L0, 1500*1000},
++	{L1, 1400*1000},
++	{L2, 1300*1000},
++	{L3, 1200*1000},
++	{L4, 1100*1000},
++	{L5, 1000*1000},
++	{L6, 900*1000},
++	{L7, 800*1000},
++	{L8, 600*1000},
++	{L9, 400*1000},
++	{L10, 200*1000},
++	{L11, 100*1000},
+ 	{0, CPUFREQ_TABLE_END},
+ };
+ 
++/* UV */
++extern int exp_UV_mV[NUM_FREQ];
++
++unsigned int freq_uv_table[NUM_FREQ][3] = {
++	//frequency, stock voltage, current voltage
++	{1400000, 1500, 1500},
++	{1400000, 1450, 1450},
++	{1300000, 1400, 1400},
++	{1200000, 1350, 1350},
++	{1100000, 1300, 1300},
++	{1000000, 1275, 1275},
++	{900000, 1225, 1225},
++	{800000, 1200, 1200},
++	{600000, 1175, 1175},
++	{400000, 1050, 1050},
++	{200000, 950, 950},
++	{100000, 950, 950}
++};
++
+ struct s5pv210_dvs_conf {
+ 	unsigned long       arm_volt;   /* uV */
+ 	unsigned long       int_volt;   /* uV */
+@@ -622,9 +813,16 @@
+ 	if (s3c_freqs.freqs.new == s3c_freqs.freqs.old && !first_run)
+ 		goto out;
+ 
+-	arm_volt = dvs_conf[index].arm_volt;
++	arm_volt = (dvs_conf[index].arm_volt - (exp_UV_mV[index] * 1000));
++	freq_uv_table[index][2] = (int)(arm_volt/1000);
+ 	int_volt = dvs_conf[index].int_volt;
+ 
++#ifdef CONFIG_DEBUG_SHADOWKERNEL
++	printk("FREQ: setting vdd %umV for speed %uMHz \n", (arm_volt/1000), (freq_table[index].frequency/1000));
++	printk("FREQ: freq_uv_table[%u][2]: %u,  arm_volt: %u \n",
++					index, freq_uv_table[index][2], arm_volt);
++#endif
++
+ 	/* New clock information update */
+ 	memcpy(&s3c_freqs.new, &clk_info[index],
+ 			sizeof(struct s3c_freq));

@@ -1,0 +1,287 @@
+From ab16eb4a705f5a82d1ed3bd39ef93d3094d44c76 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 16:07:56 -0500
+Subject: [PATCH 22/35] ADD: GPU OC <-(earthbound.iap)
+
+
+diff --git a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+index c60e798..ab5331a 100644
+--- a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
++++ b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+@@ -3,6 +3,7 @@
+ # Linux kernel version: 2.6.35.7
+ # Mon Jan 23 04:51:40 2012
+ #
++CONFIG_GPU_OC=y
+ CONFIG_ARM=y
+ CONFIG_HAVE_PWM=y
+ CONFIG_SYS_SUPPORTS_APM_EMULATION=y
+diff --git a/Kernel/arch/arm/mach-s5pv210/cpu-freq.c b/Kernel/arch/arm/mach-s5pv210/cpu-freq.c
+index 8021c6d..f90bd2e 100644
+--- a/Kernel/arch/arm/mach-s5pv210/cpu-freq.c
++++ b/Kernel/arch/arm/mach-s5pv210/cpu-freq.c
+@@ -50,6 +50,8 @@ static unsigned int mpll_freq; /* in MHz */
+ static unsigned int apll_freq_max; /* in MHz */
+ static DEFINE_MUTEX(set_freq_lock);
+ 
++#define SMOOTH_STEPS_UP
++
+ /* frequency */
+ static struct cpufreq_frequency_table freq_table[NUM_FREQ + 1] = {
+ 	{L0, 1500*1000},
+@@ -86,6 +88,25 @@ unsigned int freq_uv_table[NUM_FREQ][3] = {
+ 	{100000, 950, 950}
+ };
+ 
++#ifdef CONFIG_GPU_OC
++unsigned int gpu[NUM_FREQ][2] = {
++
++    //stock  current
++  {200, 200}, //1500MHz
++  {200, 200}, //1400MHz
++  {200, 200}, //1300MHz
++  {200, 200}, //1200MHz
++  {200, 200}, //1100MHz
++  {200, 200}, //1000MHz
++  {200, 200}, //900MHz
++  {200, 200}, //800MHz
++  {200, 200}, //600MHz
++  {200, 200}, //400MHz
++  {200, 200}, //200MHz
++  {100, 100}  //100MHz
++};
++#endif
++
+ struct s5pv210_dvs_conf {
+ 	unsigned long       arm_volt;   /* uV */
+ 	unsigned long       int_volt;   /* uV */
+@@ -576,7 +597,7 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
+ 	static bool first_run = true;
+ 	int ret = 0;
+ 	unsigned long arm_clk;
+-	unsigned int index, reg, arm_volt, int_volt;
++	unsigned int index, old_index, reg, arm_volt, int_volt;
+ 	unsigned int pll_changing = 0;
+ 	unsigned int bus_speed_changing = 0;
+ 
+@@ -658,6 +679,30 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
+ 					index, freq_uv_table[index][2], arm_volt);
+ #endif
+ 
++#ifdef SMOOTH_STEP_UP 
++  if (cpufreq_frequency_table_target(policy, freq_table, 
++      s3c_freqs.freqs.old, relation, &old_index)) { 
++    ret = -EINVAL; 
++    goto out; 
++  } 
++/* No direct jump to low freq (under 1Ghz) and go _real_ smooth
++* this time [STEP_DN] */
++  if (index < L7) {
++  if (old_index == L0)
++          index = L1;
++  else if (old_index == L1)
++          index = L2;
++  else if (old_index == L2)
++          index = L3;
++  else if (old_index == L3)
++          index = L4;
++  else if (old_index == L4)
++          index = L5;
++  else if (old_index == L5)
++          index = L6;
++  }  
++#endif 
++
+ 	/* New clock information update */
+ 	memcpy(&s3c_freqs.new, &clk_info[index],
+ 			sizeof(struct s3c_freq));
+@@ -678,6 +723,54 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
+ 	}
+ 	cpufreq_notify_transition(&s3c_freqs.freqs, CPUFREQ_PRECHANGE);
+ 
++/* This is currently broken, will fix at somepoint.  */
++
++#ifdef CONFIG_GPU_OC
++switch(s3c_freqs.old.armclk) {
++    case 1500000:
++      s3c_freqs.old.hclk_msys = gpu[0][1];
++      break;
++    case 1400000:
++      s3c_freqs.old.hclk_msys = gpu[1][1];
++      break;
++    case 1300000:
++      s3c_freqs.old.hclk_msys = gpu[2][1];
++      break;
++    case 1200000:
++      s3c_freqs.old.hclk_msys = gpu[3][1];
++      break;
++    case 1100000:
++      s3c_freqs.old.hclk_msys = gpu[4][1];
++      break;
++    case 1000000:
++      s3c_freqs.old.hclk_msys = gpu[5][1];
++      break;
++    case 900000:
++      s3c_freqs.old.hclk_msys = gpu[6][1];
++      break;
++    case 800000:
++      s3c_freqs.old.hclk_msys = gpu[7][1];
++      break;
++    case 600000:
++      s3c_freqs.old.hclk_msys = gpu[8][1];
++      break;
++    case 400000:
++      s3c_freqs.old.hclk_msys = gpu[9][1];
++      break;
++    case 200000:
++      s3c_freqs.old.hclk_msys = gpu[10][1];
++      break;
++    case 100000:
++      s3c_freqs.old.hclk_msys = gpu[11][1];
++      break;
++    }
++
++  /* Convert to khz */  
++  
++  s3c_freqs.old.hclk_msys *= 1000;
++  s3c_freqs.new.hclk_msys = gpu[index][1]*1000;
++#endif
++
+ 	if (s3c_freqs.new.fclk != s3c_freqs.old.fclk || first_run)
+ 		pll_changing = 1;
+ 
+@@ -722,7 +815,12 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
+ 		 * that should be fixed before.
+ 		 */
+ 		reg = backup_dmc1_reg * s3c_freqs.new.hclk_msys;
++#ifdef CONFIG_GPU_OC
++        	/* gpu[freq][1] is the actual hclk_msys. We want to use this in place of the static clk_info. */
++        	reg /= gpu[backup_freq_level][1];
++#else
+ 		reg /= clk_info[backup_freq_level].hclk_msys;
++#endif
+ 
+ 		/*
+ 		 * When ARM_CLK is absed on APLL->MPLL,
+@@ -824,7 +922,12 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
+ 	 * (by original refresh count * n) (n : clock rate)
+ 	 */
+ 	reg = backup_dmc1_reg * clk_info[index].hclk_msys;
++#ifdef CONFIG_GPU_OC
++      	reg = backup_dmc1_reg * gpu[index][1];
++     	reg /= gpu[backup_freq_level][1];
++#else
+ 	reg /= clk_info[backup_freq_level].hclk_msys;
++#endif
+ 	__raw_writel(reg & 0xFFFF, S5P_VA_DMC1 + 0x30);
+ 	cpufreq_notify_transition(&s3c_freqs.freqs, CPUFREQ_POSTCHANGE);
+ 
+diff --git a/Kernel/drivers/cpufreq/cpufreq.c b/Kernel/drivers/cpufreq/cpufreq.c
+index 4bfb2c1..e2683ec 100644
+--- a/Kernel/drivers/cpufreq/cpufreq.c
++++ b/Kernel/drivers/cpufreq/cpufreq.c
+@@ -42,6 +42,8 @@ int exp_UV_mV[NUM_FREQ] =     { 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0 };
+ int enabled_freqs[NUM_FREQ] = { 0, 0, 0, 0, 0,  1, 0, 1, 0, 1, 1, 1 };
+ /*  clock freqs               { 1.4GHz, 1.3GHz, 1.2GHz, 1.1GHz, 1.0GHz, 900MHz, 800MHz, 600MHz, 400MHz, 200MHz, 100MHz } */
+ 
++extern unsigned int gpu[NUM_FREQ][2];
++
+ /**
+  * The "cpufreq driver" - the arch- or hardware-dependent low
+  * level driver of CPUFreq support, and its spinlock. This lock
+@@ -739,6 +741,51 @@ static ssize_t store_states_enabled_table(struct cpufreq_policy *policy, const c
+ 
+ }
+ 
++#ifdef CONFIG_GPU_OC
++static ssize_t show_gpu_clock_table(struct cpufreq_policy *policy, char *buf) {
++ 
++  return sprintf(buf, "%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n",
++    gpu[0][0], gpu[0][1],
++    gpu[1][0], gpu[1][1],
++    gpu[2][0], gpu[2][1],
++    gpu[3][0], gpu[3][1],
++    gpu[4][0], gpu[4][1],
++    gpu[5][0], gpu[5][1],
++    gpu[6][0], gpu[6][1],
++    gpu[7][0], gpu[7][1],
++    gpu[8][0], gpu[8][1],
++    gpu[9][0], gpu[9][1],
++    gpu[10][0], gpu[10][1],
++    gpu[11][0], gpu[11][1]);
++
++}
++
++static ssize_t store_gpu_clock_table(struct cpufreq_policy *policy, const char *buf, int count) {
++  
++  unsigned int ret = -EINVAL;
++
++  ret = sscanf(buf, "%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n%d %d\n",
++    &gpu[0][0], &gpu[0][1],
++    &gpu[1][0], &gpu[1][1],
++    &gpu[2][0], &gpu[2][1],
++    &gpu[3][0], &gpu[3][1],
++    &gpu[4][0], &gpu[4][1],
++    &gpu[5][0], &gpu[5][1],
++    &gpu[6][0], &gpu[6][1],
++    &gpu[7][0], &gpu[7][1],
++    &gpu[8][0], &gpu[8][1],
++    &gpu[9][0], &gpu[9][1],
++    &gpu[10][0], &gpu[10][1],
++    &gpu[11][0], &gpu[11][1]);
++
++  if(ret != -1)
++    return -EINVAL;
++  else
++    return ret;
++
++}
++#endif
++
+ cpufreq_freq_attr_ro_perm(cpuinfo_cur_freq, 0400);
+ cpufreq_freq_attr_ro(cpuinfo_min_freq);
+ cpufreq_freq_attr_ro(cpuinfo_max_freq);
+@@ -757,6 +804,9 @@ cpufreq_freq_attr_rw(scaling_setspeed);
+ /* UV table */
+ cpufreq_freq_attr_rw(UV_mV_table);
+ cpufreq_freq_attr_rw(states_enabled_table);
++#ifdef CONFIG_GPU_OC
++cpufreq_freq_attr_rw(gpu_clock_table);
++#endif
+ 
+ static struct attribute *default_attrs[] = {
+ 	&cpuinfo_min_freq.attr,
+@@ -773,6 +823,9 @@ static struct attribute *default_attrs[] = {
+ 	&UV_mV_table.attr,
+ 	&frequency_voltage_table.attr,
+ 	&states_enabled_table.attr,
++#ifdef CONFIG_GPU_OC
++  	&gpu_clock_table.attr,
++#endif
+ 	NULL
+ };
+ 
+diff --git a/build_kernel.sh b/build_kernel.sh
+index f517ad5..cb30406 100755
+--- a/build_kernel.sh
++++ b/build_kernel.sh
+@@ -55,6 +55,7 @@ DATE=$(date +%m.%d.%H.%M)
+ KERNEL_PATH="$PWD/Kernel/arch/arm/boot/zImage"
+ RECOVERY_INITRD="$PWD/recovery_cm9"
+ KERNEL_INITRD="$PWD/initramfs_cm9"
++ZIMAGE_ARG="$LOCALVERSION.CM9.$DATE"
+ 
+ DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+ 
+@@ -112,7 +113,7 @@ BUILD_KERNEL()
+ 	pushd $KERNEL_BUILD_DIR
+ 		export KDIR=`pwd`
+ 		make ARCH=arm $DEFCONFIG_STRING
+-		make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN/$TOOLCHAIN_PREFIX LOCALVERSION=$LOCALVERSION_STRING 2>&1 | tee make.out
++		make -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN/$TOOLCHAIN_PREFIX LOCALVERSION=$ZIMAGE_ARG 2>&1 | tee make.out
+ #		make V=1 -j$CPU_JOB_NUM ARCH=arm CROSS_COMPILE=$TOOLCHAIN/$TOOLCHAIN_PREFIX LOCALVERSION=$LOCALVERSION_STRING 2>&1 | tee make.out
+ #		cp arch/arm/boot/zImage /home/nubecoder/cm_android/system/device/samsung/epic/kernel
+ 	popd
+-- 
+1.7.5.4
+

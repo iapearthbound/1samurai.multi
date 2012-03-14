@@ -1,0 +1,78 @@
+From e59bd69064703488fe5b22089e55c6f117aa88e5 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sun, 5 Feb 2012 15:36:09 -0500
+Subject: [PATCH 24/35] Erase memory pages when they are freed
+ <-(renaudallard)
+
+
+diff --git a/Kernel/arch/arm/include/asm/kmap_types.h b/Kernel/arch/arm/include/asm/kmap_types.h
+index e51b1e8..32a3113 100644
+--- a/Kernel/arch/arm/include/asm/kmap_types.h
++++ b/Kernel/arch/arm/include/asm/kmap_types.h
+@@ -21,6 +21,7 @@ enum km_type {
+ 	KM_L1_CACHE,
+ 	KM_L2_CACHE,
+ 	KM_KDB,
++	KM_CLEARPAGE,
+ 	KM_TYPE_NR
+ };
+ 
+diff --git a/Kernel/include/linux/highmem.h b/Kernel/include/linux/highmem.h
+index caafd05..ef3ae98 100644
+--- a/Kernel/include/linux/highmem.h
++++ b/Kernel/include/linux/highmem.h
+@@ -143,6 +143,18 @@ static inline void clear_highpage(struct page *page)
+ 	kunmap_atomic(kaddr, KM_USER0);
+ }
+ 
++static inline void sanitize_highpage(struct page *page)
++{
++  	void *kaddr;
++  	unsigned long flags;
++
++  	local_irq_save(flags);
++  	kaddr = kmap_atomic(page, KM_CLEARPAGE);
++  	clear_page(kaddr);
++  	kunmap_atomic(kaddr, KM_CLEARPAGE);
++  	local_irq_restore(flags);
++}
++
+ static inline void zero_user_segments(struct page *page,
+ 	unsigned start1, unsigned end1,
+ 	unsigned start2, unsigned end2)
+diff --git a/Kernel/mm/page_alloc.c b/Kernel/mm/page_alloc.c
+index 18cdfc4..7e12c8b 100644
+--- a/Kernel/mm/page_alloc.c
++++ b/Kernel/mm/page_alloc.c
+@@ -643,6 +643,8 @@ static bool free_pages_prepare(struct page *page, unsigned int order)
+ 	int i;
+ 	int bad = 0;
+ 
++	unsigned long index = 1UL << order;
++
+ 	trace_mm_page_free_direct(page, order);
+ 	kmemcheck_free_shadow(page, order);
+ 
+@@ -661,6 +663,10 @@ static bool free_pages_prepare(struct page *page, unsigned int order)
+ 		debug_check_no_obj_freed(page_address(page),
+ 					   PAGE_SIZE << order);
+ 	}
++
++	for (; index; --index)
++    		sanitize_highpage(page + index - 1);
++	
+ 	arch_free_page(page, order);
+ 	kernel_map_pages(page, 1 << order, 0);
+ 
+@@ -4001,7 +4007,7 @@ static void __init setup_usemap(struct pglist_data *pgdat,
+ 		zone->pageblock_flags = alloc_bootmem_node(pgdat, usemapsize);
+ }
+ #else
+-static void inline setup_usemap(struct pglist_data *pgdat,
++static inline void setup_usemap(struct pglist_data *pgdat,
+ 				struct zone *zone, unsigned long zonesize) {}
+ #endif /* CONFIG_SPARSEMEM */
+ 
+-- 
+1.7.5.4
+

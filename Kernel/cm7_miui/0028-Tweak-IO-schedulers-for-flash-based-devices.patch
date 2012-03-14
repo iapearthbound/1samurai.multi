@@ -1,0 +1,35 @@
+From f24b418d4b17d77d552f6e366ca39ce7a6857828 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sun, 5 Feb 2012 15:58:36 -0500
+Subject: [PATCH 28/35] Tweak IO schedulers for flash based devices
+
+
+diff --git a/Kernel/block/deadline-iosched.c b/Kernel/block/deadline-iosched.c
+index b547cbc..2d597f7 100644
+--- a/Kernel/block/deadline-iosched.c
++++ b/Kernel/block/deadline-iosched.c
+@@ -20,7 +20,7 @@
+ static const int read_expire = HZ / 2;  /* max time before a read is submitted. */
+ static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SOFT! */
+ static const int writes_starved = 2;    /* max times reads can starve a write */
+-static const int fifo_batch = 16;       /* # of sequential requests treated as one
++static const int fifo_batch = 1;        /* # of sequential requests treated as one
+ 				     by the above parameters. For throughput. */
+ 
+ struct deadline_data {
+diff --git a/Kernel/block/sio-iosched.c b/Kernel/block/sio-iosched.c
+index 8f0beb9..ec22934 100644
+--- a/Kernel/block/sio-iosched.c
++++ b/Kernel/block/sio-iosched.c
+@@ -28,7 +28,7 @@ enum {
+ /* Tunables */
+ static const int sync_expire = HZ / 2;	/* max time before a sync is submitted. */
+ static const int async_expire = 5 * HZ;	/* ditto for async, these limits are SOFT! */
+-static const int fifo_batch = 16;	/* # of sequential requests treated as one
++static const int fifo_batch = 1;	/* # of sequential requests treated as one
+ 					   by the above parameters. For throughput. */
+ 
+ /* Elevator data */
+-- 
+1.7.5.4
+

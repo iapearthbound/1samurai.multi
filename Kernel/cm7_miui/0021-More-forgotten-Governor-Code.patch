@@ -1,0 +1,23 @@
+From 11a4505e210c0acbaeca89d50614fc4316543896 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 15:32:24 -0500
+Subject: [PATCH 21/35] More forgotten Governor Code...
+
+
+diff --git a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+index 24ee25e..c60e798 100644
+--- a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
++++ b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+@@ -476,6 +476,9 @@ CONFIG_CPU_FREQ_GOV_SMARTASS2=y
+ CONFIG_CPU_FREQ_GOV_SAVAGEDZEN=y
+ CONFIG_CPU_FREQ_GOV_INTELLIDEMAND=y
+ CONFIG_CPU_FREQ_GOV_LAGFREE=y
++CONFIG_CPU_FREQ_GOV_LAGFREE=y
++CONFIG_CPU_FREQ_MIN_TICKS=10
++CONFIG_CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER=250
+ CONFIG_CPU_FREQ_GOV_SMARTASS=y
+ CONFIG_SMARTASS_SLEEP_MAX=400000
+ CONFIG_SMARTASS_SLEEP_WAKEUP=600000
+-- 
+1.7.5.4
+

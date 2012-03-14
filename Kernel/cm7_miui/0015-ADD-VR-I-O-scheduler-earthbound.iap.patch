@@ -1,0 +1,79 @@
+From 21fc3a6ecb6061c7fa5aaf9cf78278d753e70132 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 14:56:46 -0500
+Subject: [PATCH 15/35] ADD: VR I/O scheduler <-(earthbound.iap)
+
+
+diff --git a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+index e0cebcc..d48c41a 100644
+--- a/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
++++ b/Kernel/arch/arm/configs/cyanogenmod_epicmtd_defconfig
+@@ -39,7 +39,7 @@ CONFIG_LOCK_KERNEL=y
+ CONFIG_INIT_ENV_ARG_LIMIT=32
+ CONFIG_CROSS_COMPILE=""
+ CONFIG_LOCALVERSION=""
+-CONFIG_LOCALVERSION_AUTO=y
++# CONFIG_LOCALVERSION_AUTO is not set
+ CONFIG_HAVE_KERNEL_GZIP=y
+ CONFIG_HAVE_KERNEL_LZMA=y
+ CONFIG_HAVE_KERNEL_LZO=y
+@@ -171,12 +171,14 @@ CONFIG_IOSCHED_CFQ=y
+ CONFIG_IOSCHED_BFQ=y
+ CONFIG_CGROUP_BFQIO=y
+ CONFIG_IOSCHED_SIO=y
++CONFIG_IOSCHED_VR=y
+ # CONFIG_DEFAULT_DEADLINE is not set
+-CONFIG_DEFAULT_CFQ=y
++CONFIG_DEFAULT_VR=y
+ # CONFIG_DEFAULT_BFQ is not set
+ # CONFIG_DEFAULT_SIO is not set
+ # CONFIG_DEFAULT_NOOP is not set
+-CONFIG_DEFAULT_IOSCHED="cfq"
++# CONFIG_DEFAULT_CFQ is not set
++CONFIG_DEFAULT_IOSCHED="vr"
+ # CONFIG_INLINE_SPIN_TRYLOCK is not set
+ # CONFIG_INLINE_SPIN_TRYLOCK_BH is not set
+ # CONFIG_INLINE_SPIN_LOCK is not set
+diff --git a/Kernel/block/Kconfig.iosched b/Kernel/block/Kconfig.iosched
+index 7e37022..b8b8f34 100644
+--- a/Kernel/block/Kconfig.iosched
++++ b/Kernel/block/Kconfig.iosched
+@@ -82,6 +82,13 @@ config IOSCHED_SIO
+          basic merging, trying to keep a minimum overhead. It is aimed
+          mainly for aleatory access devices (eg: flash devices).
+ 
++config IOSCHED_VR
++        tristate "V(R) I/O scheduler"
++    	default n
++    	---help---
++      	 Requests are chosen according to SSTF with a penalty of rev_penalty
++      	 for switching head direction.
++
+ choice
+ 	prompt "Default I/O scheduler"
+ 	default DEFAULT_CFQ
+@@ -113,6 +120,7 @@ config DEFAULT_IOSCHED
+ 	default "bfq" if DEFAULT_BFQ
+ 	default "sio" if DEFAULT_SIO
+ 	default "noop" if DEFAULT_NOOP
++	default "vr" if DEFAULT_VR
+ 
+ endmenu
+ 
+diff --git a/Kernel/block/Makefile b/Kernel/block/Makefile
+index ffa258b..0d3a73d 100644
+--- a/Kernel/block/Makefile
++++ b/Kernel/block/Makefile
+@@ -13,7 +13,8 @@ obj-$(CONFIG_IOSCHED_NOOP)	+= noop-iosched.o
+ obj-$(CONFIG_IOSCHED_DEADLINE)	+= deadline-iosched.o
+ obj-$(CONFIG_IOSCHED_CFQ)	+= cfq-iosched.o
+ obj-$(CONFIG_IOSCHED_BFQ)	+= bfq-iosched.o
+-obj-$(CONFIG_IOSCHED_SIO)  += sio-iosched.o
++obj-$(CONFIG_IOSCHED_SIO)  	+= sio-iosched.o
++obj-$(CONFIG_IOSCHED_VR)        += vr-iosched.o
+ 
+ obj-$(CONFIG_BLOCK_COMPAT)	+= compat_ioctl.o
+ obj-$(CONFIG_BLK_DEV_INTEGRITY)	+= blk-integrity.o
+-- 
+1.7.5.4
+

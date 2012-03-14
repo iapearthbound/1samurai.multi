@@ -1,0 +1,23 @@
+From 585a67825b771deffb029506b9a57adf33460441 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sun, 5 Feb 2012 15:55:52 -0500
+Subject: [PATCH 27/35] ARM: dma-mapping: free allocated page if unable to map
+ (Russell King)
+
+
+diff --git a/Kernel/arch/arm/mm/dma-mapping.c b/Kernel/arch/arm/mm/dma-mapping.c
+index 9e7742f..487b015 100644
+--- a/Kernel/arch/arm/mm/dma-mapping.c
++++ b/Kernel/arch/arm/mm/dma-mapping.c
+@@ -297,6 +297,8 @@ __dma_alloc(struct device *dev, size_t size, dma_addr_t *handle, gfp_t gfp,
+ 
+ 	if (addr)
+ 		*handle = page_to_dma(dev, page);
++	else
++    		__dma_free_buffer(page,size);
+ 
+ 	return addr;
+ }
+-- 
+1.7.5.4
+

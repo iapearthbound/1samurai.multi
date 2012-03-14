@@ -1,0 +1,27 @@
+From 2412b6ccd919fb2bc459dae439ad405887c7c483 Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sun, 5 Feb 2012 03:11:10 -0500
+Subject: [PATCH 23/35] GPU OC: forgotten code...
+
+
+diff --git a/Kernel/arch/arm/mach-s5pv210/Kconfig b/Kernel/arch/arm/mach-s5pv210/Kconfig
+index 1d8958e..88e8b56 100644
+--- a/Kernel/arch/arm/mach-s5pv210/Kconfig
++++ b/Kernel/arch/arm/mach-s5pv210/Kconfig
+@@ -53,6 +53,13 @@ config S5PV210_POWER_DOMAIN
+ 	default y
+ 	help
+ 	  Enable S5PV210 power domain support.
++
++config GPU_OC
++        bool "enable GPU Overclock"
++        default n
++        help 
++          Enables GPU overclock for SGX540 (for future use)
++
+ choice
+         prompt "Select ARIES RAM SIZE "
+ config DDR_RAM_3G
+-- 
+1.7.5.4
+

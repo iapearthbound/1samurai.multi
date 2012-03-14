@@ -1,0 +1,23 @@
+From 91b2852af204dd2648c22b06a2e3c0265072cfcf Mon Sep 17 00:00:00 2001
+From: Justin <earthbound.iap@gmail.com>
+Date: Sat, 4 Feb 2012 15:15:46 -0500
+Subject: [PATCH 18/35] FIX: memory deadlock...
+
+
+diff --git a/Kernel/mm/ashmem.c b/Kernel/mm/ashmem.c
+index f92eb34..00beada 100644
+--- a/Kernel/mm/ashmem.c
++++ b/Kernel/mm/ashmem.c
+@@ -357,7 +357,8 @@ static int ashmem_shrink(struct shrinker *s, int nr_to_scan, gfp_t gfp_mask)
+ 	if (!nr_to_scan)
+ 		return lru_count;
+ 
+-	mutex_lock(&ashmem_mutex);
++	if (!mutex_trylock(&ashmem_mutex))
++           	return -1;
+ 	list_for_each_entry_safe(range, next, &ashmem_lru_list, lru) {
+ 		struct inode *inode = range->asma->file->f_dentry->d_inode;
+ 		loff_t start = range->pgstart * PAGE_SIZE;
+-- 
+1.7.5.4
+
