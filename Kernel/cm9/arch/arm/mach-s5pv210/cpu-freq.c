@@ -50,8 +50,6 @@ static unsigned int mpll_freq; /* in MHz */
 static unsigned int apll_freq_max; /* in MHz */
 static DEFINE_MUTEX(set_freq_lock);
 
-#define SMOOTH_STEPS_UP
-
 /* frequency */
 static struct cpufreq_frequency_table freq_table[NUM_FREQ + 1] = {
 	{L0, 1500*1000},
@@ -678,30 +676,6 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
 	printk("FREQ: freq_uv_table[%u][2]: %u,  arm_volt: %u \n",
 					index, freq_uv_table[index][2], arm_volt);
 #endif
-
-#ifdef SMOOTH_STEP_UP 
-  if (cpufreq_frequency_table_target(policy, freq_table, 
-      s3c_freqs.freqs.old, relation, &old_index)) { 
-    ret = -EINVAL; 
-    goto out; 
-  } 
-/* No direct jump to low freq (under 1Ghz) and go _real_ smooth
-* this time [STEP_DN] */
-  if (index < L7) {
-  if (old_index == L0)
-          index = L1;
-  else if (old_index == L1)
-          index = L2;
-  else if (old_index == L2)
-          index = L3;
-  else if (old_index == L3)
-          index = L4;
-  else if (old_index == L4)
-          index = L5;
-  else if (old_index == L5)
-          index = L6;
-  }  
-#endif 
 
 	/* New clock information update */
 	memcpy(&s3c_freqs.new, &clk_info[index],

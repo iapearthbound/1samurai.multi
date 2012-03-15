@@ -50,6 +50,8 @@ static unsigned int mpll_freq; /* in MHz */
 static unsigned int apll_freq_max; /* in MHz */
 static DEFINE_MUTEX(set_freq_lock);
 
+#define SMOOTH_STEPS_UP
+
 /* frequency */
 static struct cpufreq_frequency_table freq_table[NUM_FREQ + 1] = {
 	{L0, 1500*1000},
@@ -595,7 +597,7 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
 	static bool first_run = true;
 	int ret = 0;
 	unsigned long arm_clk;
-	unsigned int index, reg, arm_volt, int_volt;
+	unsigned int index, old_index, reg, arm_volt, int_volt;
 	unsigned int pll_changing = 0;
 	unsigned int bus_speed_changing = 0;
 
