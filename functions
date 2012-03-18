@@ -315,3 +315,8 @@ function GIT_HELPER()
     esac
   fi
 }
+function INVALID()
+{
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+}

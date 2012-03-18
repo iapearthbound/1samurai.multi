@@ -34,16 +34,31 @@ function REPO_MENU()
     echo $bld$cyn" ______________________________________________________________________________ "
     echo $bld$cyn"| Git Helper Menu                                                              |"
     echo $bld$cyn"|------------------------------------------------------------------------------|"
+  else
+    echo $bld$cyn" ______________________________________________________________________________ "
+    echo $bld$cyn"| Limited Git Helper Menu select v and enter a repo for added functionality    |"
+    echo $bld$cyn"|------------------------------------------------------------------------------|"
+  fi
     echo $bld$grn"| [G] Global Setup/Clone Menu                                                  |"
+  if [ -e .git ] ; then
     echo $bld$grn"| [C] Commit Helper Menu                                                       |"
     echo $bld$grn"| [B] Branch Helper Menu                                                       |"
     echo $bld$grn"| [S] Stash Helper Menu                                                        |"
+  else
+    echo $rst$grn"| [C] Commit Helper Menu                                                       |"
+    echo $rst$grn"| [B] Branch Helper Menu                                                       |"
+    echo $rst$grn"| [S] Stash Helper Menu                                                        |"
+  fi
     echo $bld$grn"| [P] Patch Helper Menu                                                        |"
     echo $bld$grn"| [V] View/Switch Repo                                                         |"
     echo $bld$cyn"|-Build-Helper-Menu------------------------------------------------------------|"
     echo $bld$grn"| [1] Setup Build Environment (installs build packages)                        |"
     echo $bld$grn"| [2] Auto Clone Samurai Kernel Repo                                           |"
+  if [ -e build_kernel.sh ] ; then
     echo $bld$grn"| [3] Build Kernel (try to execute build_kernel.sh)                            |"
+  else
+    echo $rst$grn"| [3] Build Kernel (try to execute build_kernel.sh)                            |"
+  fi
     echo $bld$grn"| [E] Extract Boot Image                                                       |"
     echo $bld$grn"| [Q] Command Prompt                                                           |"
     echo $bld$cyn"|-Git-Helper-Uninstall---------------------------------------------------------|"
@@ -70,23 +85,35 @@ function REPO_MENU()
           REPO_MENU
       ;;
       "C" | "c" )
+  if [ -e .git ] ; then
       #commit helper menu
         COMMIT_MENU
         echo $bld$rst
         REPO_MENU
-      ;;
+else
+      INVALID
+fi
+;;
       "B" | "b" )
+  if [ -e .git ] ; then
       #branch helper menu
         BRANCH_MENU
         echo $bld$rst
         REPO_MENU
-      ;;
+else
+      INVALID
+fi
+;;
       "S" | "s" )
+  if [ -e .git ] ; then
       #Stash helper menu
         STASH_MENU
         echo $bld$rst
         REPO_MENU
-      ;;
+else
+      INVALID
+fi
+;;
       "P" | "p" )
       #patch helper menu
         PATCH_MENU
@@ -115,6 +142,7 @@ function REPO_MENU()
         REPO_MENU
       ;;
       "3" )
+
       #build Kernel
         BUILD_KERNEL
         echo $bld$rst
@@ -149,102 +177,6 @@ function REPO_MENU()
         REPO_MENU
       ;;
     esac
-  else
-    echo $bld$cyn" ______________________________________________________________________________ "
-    echo $red$cyn"| Limited Git Helper Menu <-(please use [V], select a Repo to unlock options)  |"
-    echo $bld$cyn"|------------------------------------------------------------------------------|"
-    echo $bld$grn"| [G] Global Setup/Clone Menu                                                  |"
-    echo $rst$grn"| [C] Commit Helper Menu                                                       |"
-    echo $rst$grn"| [B] Branch Helper Menu                                                       |"
-    echo $rst$grn"| [S] Stash Helper Menu                                                        |"
-    echo $rst$grn"| [P] Patch Helper Menu                                                        |"
-    echo $bld$grn"| [V] View/Switch Repo                                                         |"
-    echo $bld$cyn"|-Build-Helper-Menu------------------------------------------------------------|"
-    echo $bld$grn"| [1] Setup Build Environment (installs build packages)                        |"
-    echo $bld$grn"| [2] Auto Clone Samurai Kernel Repo                                           |"
-    echo $bld$grn"| [3] Build Kernel (try to execute build_kernel.sh)                            |"
-    echo $bld$grn"| [E] Extract Boot Image                                                       |"
-    echo $bld$grn"| [Q] Command Prompt                                                           |"
-    echo $bld$cyn"|-Git-Helper-Uninstall---------------------------------------------------------|"
-    echo $bld$grn"| [U] UnInstall Git Helper                                                     |"
-    echo $bld$grn"| [X] Exit                                                                     |"
-    echo $bld$cyn"|------------------------------------------------------------------------------|"$bld$grn
-    echo $bld$grn"| WORKING DIR    : $PWD"  
-    if [ -e .git ] ; then
-      REPO=$(basename $PWD)
-      echo $bld$grn"| CURRENT REPO   : $REPO"
-      CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-      echo $bld$grn"| CURRENT BRANCH : $CURRENT_BRANCH" 
-      echo $bld$cyn"|______________________________________________________________________________|"$bld$grn
-    else
-      echo $bld$grn"| Current Directory is Not A Repo (enter a git Repo to view more menu options) |"
-      echo $bld$cyn"|______________________________________________________________________________|"$bld$grn
-    fi
-  fi
-    read -p "  ENTER MENU OPTION : " menu
-  case "$menu" in
-    "G" | "g" )
-    #global setup/clone menu
-      SETUP_MENU
-      echo $bld$rst
-      REPO_MENU
-    ;;
-    "V" | "v" )
-    #view/switch repo
-      ENTER_DIRECTORY
-      echo $bld$rst
-      REPO_MENU
-    ;;
-##############################################################
-#			Menu Divider			     #
-##############################################################
-    "1" )
-    #setup build environment
-      SETUP_BUILD
-      echo $bld$rst
-      REPO_MENU
-    ;;
-    "2" )
-    #auto clone samurai repo
-      CLONE_SAMURAI
-      echo $bld$rst
-      REPO_MENU
-    ;;
-    "3" )
-    #build Kernel
-      BUILD_KERNEL
-      echo $bld$rst
-      REPO_MENU
-    ;;
-    "E" | "e" )
-    #extract boot.img
-      BOOT_IMG
-      echo $bld$rst
-      REPO_MENU
-    ;;
-    "Q" | "q" )
-    #command prompt
-      CMD
-      echo $bld$rst
-      REPO_MENU
-    ;;
-##############################################################
-#			Menu Divider			     #
-##############################################################
-    "U" | "u" )
-    #uninstall git helper
-      UNINSTALL_HELPER
-      echo $bld$rst   
-    ;;
-    "X" | "x" )
-      echo $bld$rst
-      exit
-    ;;
-    * )
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      REPO_MENU
-    ;;
-  esac
 }
 
 ##############################################################
@@ -1555,6 +1487,16 @@ function UNINSTALL_HELPER()
       UNINSTALL_HELPER
     ;;
   esac 
+}
+
+function INVALID()
+{
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+  if [ -e /usr/bin/githelper ] ; then
+    githelper
+  else
+    HELPER_INSTALL
+  fi
 }
 
 ##############################################################

@@ -90,8 +90,7 @@ if [ -e Kernel/bml_mtd ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for Touch Wiz BML el30
@@ -117,8 +116,7 @@ if [ -e Kernel/bml_mtd ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for Touch Wiz MTD
@@ -146,8 +144,7 @@ if [ -e Kernel/bml_mtd ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for MIUI MTD
@@ -175,8 +172,7 @@ if [ -e Kernel/cm7_miui ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for CM7 MTD
@@ -204,8 +200,7 @@ if [ -e Kernel/cm7_miui ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for CM9 MTD
@@ -233,8 +228,7 @@ if [ -e Kernel/cm9 ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
   #Compile Kernel for MIUIv4 MTD
@@ -262,8 +256,7 @@ if [ -e Kernel/cm9 ] ; then
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
 else
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
 fi
 ;;
     "G" | "g" )
@@ -275,8 +268,7 @@ fi
       exit	
     ;;
     * )
-      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
-      ./build_kernel.sh
+      INVALID
     ;;
   esac
 
