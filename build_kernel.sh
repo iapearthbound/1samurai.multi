@@ -34,14 +34,30 @@ source $PWD/functions
   echo $bld$cyn" ______________________________________________________________________________ "
   echo $bld$cyn"| Please Choose Platform To Compile For...                                     |"
   echo $bld$cyn"|------------------------------------------------------------------------------|"
+if [ -e Kernel/bml_mtd ] ; then
   echo $bld$grn"|  [1] Compile Kernel for Touch Wiz BML ie22                                   |"
+fi
+if [ -e Kernel/bml_mtd ] ; then
   echo $bld$grn"|  [2] Compile Kernel for Touch Wiz BML el30                                   |"
+fi
+if [ -e Kernel/bml_mtd ] ; then
   echo $bld$grn"|  [3] Compile Kernel for Touch Wiz MTD                                        |"
+fi
+if [ -e Kernel/cm7_miui ] ; then
   echo $bld$grn"|  [4] Compile Kernel for MIUI MTD                                             |"
+fi
+if [ -e Kernel/cm7_miui ] ; then
   echo $bld$grn"|  [7] Compile Kernel for CM7 MTD                                              |"
+fi
+if [ -e Kernel/cm9 ] ; then
   echo $bld$grn"|  [9] Compile Kernel for CM9 MTD                                              |"
+fi
+if [ -e Kernel/cm9 ] ; then
+  echo $bld$grn"|  [m4] Compile Kernel for MIUIv4 MTD                                          |"
+fi
+  echo $bld$cyn"|------------------------------------------------------------------------------|"
   echo $bld$grn"|  [G] Git Helper Menu                                                         |"
-  echo $bld$grn"|  [X] Exit <- exits script                                                    |"
+  echo $bld$grn"|  [X] Exit Build Helper                                                       |"
   echo $bld$cyn"|------------------------------------------------------------------------------|"
   echo $bld$grn"| WORKING DIR    : $PWD" 
     REPO=$(basename $PWD)
@@ -53,6 +69,7 @@ source $PWD/functions
   case "$compile" in
   #Compile Kernel for Touch Wiz BML ei22
     "1" )
+if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cleangb_bml_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
@@ -72,9 +89,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
   #Compile Kernel for Touch Wiz BML el30
     "2" )
+if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cleangb_bml_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
@@ -94,9 +116,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-	;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
   #Compile Kernel for Touch Wiz MTD
     "3" )
+if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cleangb_mtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
@@ -118,9 +145,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
   #Compile Kernel for MIUI MTD
     "4" )
+if [ -e Kernel/cm7_miui ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm7_miui"
@@ -142,9 +174,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
   #Compile Kernel for CM7 MTD
     "7" )
+if [ -e Kernel/cm7_miui ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm7_miui"
@@ -166,9 +203,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
   #Compile Kernel for CM9 MTD
     "9" )
+if [ -e Kernel/cm9 ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm9"
@@ -190,9 +232,14 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
-  #Compile Kernel for CM9 MTD
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
+  #Compile Kernel for MIUIv4 MTD
     "m4" )
+if [ -e Kernel/cm9 ] ; then
     #Platform Specific Variables
       DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm9"
@@ -214,7 +261,11 @@ source $PWD/functions
       tput setaf 2
       read -p "Press [Enter] key to continue..."
       ./build_kernel.sh
-    ;;
+else
+      echo $bld$red"**********************You*Have*Entered*An*Incorrect*Option**********************"
+      ./build_kernel.sh
+fi
+;;
     "G" | "g" )
     #Git Helper Menu
       GIT_HELPER

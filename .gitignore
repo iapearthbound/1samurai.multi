@@ -5,6 +5,10 @@
 *.o
 *.o.d
 *.order
+*~
+*.orig
+*.rej
+*.patch
 tools/kexec-cwm-test-zip/META-INF/com/google/android/update-binary
 tools/kexec-cwm-test-zip/zImage
 boot_zImage.zip
@@ -78,6 +82,8 @@ Kernel/cm9/usr/gen_init_cpio
 Kernel/cm9/usr/initramfs_data.cpio
 Kernel/cm9/make.out
 Kernel/cm9/vmlinux
+out/cm9_out/boot.img
+out/miuiv4_out/boot.img
 
 Kernel/cm7_miui/.config
 Kernel/cm7_miui/.config.old
@@ -149,6 +155,8 @@ Kernel/cm7_miui/usr/gen_init_cpio
 Kernel/cm7_miui/usr/initramfs_data.cpio
 Kernel/cm7_miui/make.out
 Kernel/cm7_miui/vmlinux
+out/cm7_out/boot.img
+out/miui_out/boot.img
 
 .DS_Store
 
