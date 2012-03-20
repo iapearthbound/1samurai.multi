@@ -71,7 +71,7 @@ fi
     "1" )
 if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cleangb_bml_defconfig
+      DEFCONFIG_STRING=samurai_bml_ei22_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
       KERNEL_INITRD="$PWD/initramfs/initramfs_ei22"
       BUILD_OUT="$PWD/out/bml_ei22_out"
@@ -97,7 +97,7 @@ fi
     "2" )
 if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cleangb_bml_defconfig
+      DEFCONFIG_STRING=samurai_bml_el30_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
       KERNEL_INITRD="$PWD/initramfs/initramfs_el30"
       BUILD_OUT="$PWD/out/bml_el30_out"
@@ -123,7 +123,7 @@ fi
     "3" )
 if [ -e Kernel/bml_mtd ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cleangb_mtd_defconfig
+      DEFCONFIG_STRING=samurai_mtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
       RECOVERY_INITRD="$PWD/recovery/recovery_mtd"
       KERNEL_INITRD="$PWD/initramfs/firstStage"
@@ -151,7 +151,7 @@ fi
     "4" )
 if [ -e Kernel/cm7_miui ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+      DEFCONFIG_STRING=samurai_mtd_miui_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm7_miui"
       RECOVERY_INITRD="$PWD/recovery/recovery_miui"
       KERNEL_INITRD="$PWD/initramfs/initramfs_miui"
@@ -179,7 +179,7 @@ fi
     "7" )
 if [ -e Kernel/cm7_miui ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+      DEFCONFIG_STRING=samurai_mtd_cm7_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm7_miui"
       RECOVERY_INITRD="$PWD/recovery/recovery_cm7"
       KERNEL_INITRD="$PWD/initramfs/initramfs_cm7"
@@ -207,7 +207,7 @@ fi
     "9" )
 if [ -e Kernel/cm9 ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+      DEFCONFIG_STRING=samurai_mtd_cm9_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm9"
       RECOVERY_INITRD="$PWD/recovery/recovery_cm9"
       KERNEL_INITRD="$KERNEL_BUILD_DIR/usr/initramfs_cm9"
@@ -235,7 +235,7 @@ fi
     "m4" )
 if [ -e Kernel/cm9 ] ; then
     #Platform Specific Variables
-      DEFCONFIG_STRING=cyanogenmod_epicmtd_defconfig
+      DEFCONFIG_STRING=samurai_mtd_miuiv4_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/cm9"
       RECOVERY_INITRD="$PWD/recovery/recovery_cm9"
       KERNEL_INITRD="$KERNEL_BUILD_DIR/usr/initramfs_cm9"
