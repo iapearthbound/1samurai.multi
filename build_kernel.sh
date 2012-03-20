@@ -126,7 +126,7 @@ if [ -e Kernel/bml_mtd ] ; then
       DEFCONFIG_STRING=cleangb_mtd_defconfig
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
       RECOVERY_INITRD="$PWD/recovery/recovery_mtd"
-      KERNEL_INITRD="$PWD/initramfs/initramfs_mtd"
+      KERNEL_INITRD="$PWD/initramfs/firstStage"
       BUILD_OUT="$PWD/out/mtd_out"
       BUILD_PLATFORM="TW.MTD"
       ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"

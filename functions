@@ -142,20 +142,21 @@ function PACKAGE_BOOTIMG()
   echo $bld$cyn"| CREATEING: Boot Image                                                        |"
   echo $bld$cyn"|------------------------------------------------------------------------------|"$bld$grn
   echo "  CREATING: ramdisk.img"
-    /$PWD/mkbootfs $KERNEL_INITRD | /$PWD/minigzip > $BUILD_OUT/ramdisk-kernel.img		
-    echo "  CREATING: ramdisk-recovery.img"
-    /$PWD/mkbootfs $RECOVERY_INITRD > ramdisk-recovery.cpio
-    /$PWD/minigzip < ramdisk-recovery.cpio > $BUILD_OUT/ramdisk-recovery.img
-    if [ -f /$PWD/zipped/boot.img ] ; then
-      echo "  REMOVE: old boot.img"
-      rm -f boot.img
-    fi
-    echo "  CREATING: boot.img"
-    ./mkshbootimg.py $BUILD_OUT/boot.img $KERNEL_BUILD_DIR/arch/arm/boot/zImage $BUILD_OUT/ramdisk-kernel.img $BUILD_OUT/ramdisk-recovery.img
-    echo "  CLEAN: temp files"
-    rm -f ramdisk-kernel.img
-    rm -f ramdisk-recovery.cpio
-    rm -f ramdisk-recovery.img
+  #/$PWD/mkbootfs $KERNEL_INITRD | /$PWD/minigzip > $BUILD_OUT/ramdisk-kernel.img
+  #Using recovery extracted from boot.img for now...		
+  #echo "create ramdisk-recovery.img"
+  #/$PWD/mkbootfs $RECOVERY_INITRD > ramdisk-recovery.cpio
+  #/$PWD/minigzip < ramdisk-recovery.cpio > RYU/ramdisk-recovery.img
+  if [ -f /$PWD/zipped/boot.img ] ; then
+    echo "  REMOVE: old boot.img"
+    rm -f boot.img
+  fi
+  echo "  CREATING: boot.img"
+  ./mkshbootimg.py $BUILD_OUT/boot.img $KERNEL_BUILD_DIR/arch/arm/boot/zImage $BUILD_OUT/boot.cpio.gz $BUILD_OUT/recovery.cpio.gz
+  echo "  CLEAN: temp files"
+  rm -f ramdisk-kernel.img
+  rm -f ramdisk-recovery.cpio
+  rm -f ramdisk-recovery.img
     echo $bld$cyn"|------------------------------------------------------------------------------|"
     echo $bld$grn"| Boot Image Created Succesfully                                               |"
     echo $bld$cyn"|______________________________________________________________________________|"
