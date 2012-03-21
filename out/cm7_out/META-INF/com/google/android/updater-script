@@ -70,7 +70,7 @@ sleep(1);
 
 	ui_print("");
 	ui_print("KERNEL: SAMURAI");
-        ui_print("CODE NAME: CM7.MTD.TANTO");
-        ui_print("COMPILED ON: Sat.Feb.18.2012.11:15:47.PM");
+        ui_print("CODE NAME: CM7.MTD.DAITO");
+        ui_print("COMPILED ON: Tue.Mar.20.2012.07:14:10.PM");
 	ui_print("CREATED BY: EarthBound.IAP");
 show_progress(0.100000, 0);

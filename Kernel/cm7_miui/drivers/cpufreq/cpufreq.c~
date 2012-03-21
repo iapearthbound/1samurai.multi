@@ -38,9 +38,9 @@
 
 /* UV */
 extern unsigned int freq_uv_table[NUM_FREQ][3];
-int exp_UV_mV[NUM_FREQ] =     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int enabled_freqs[NUM_FREQ] = { 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1 };
-/*  clock freqs               { 1.5GHz,1.4GHz,1.3GHz,1.2GHz,1.1GHz,1.0GHz,900MHz,800MHz,600MHz,400MHz,200MHz,100MHz } */
+int exp_UV_mV[NUM_FREQ] =     {       0,       0,       0,       0,       0,       0,       0,        0,      0,      0,      0 };
+int enabled_freqs[NUM_FREQ] = {       0,       0,       0,       0,       1,       0,       1,        0,      1,      1,      1 };
+/*  clock freqs               {  1.4GHz,  1.3GHz,  1.2GHz,  1.1GHz,  1.0GHz,  900MHz,  800MHz,  600MHz,  400MHz, 200MHz, 100MHz } */
 
 extern unsigned int gpu[NUM_FREQ][2];
 
@@ -685,7 +685,8 @@ static ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 static ssize_t show_frequency_voltage_table(struct cpufreq_policy *policy,
 						char *buf) {
 
-	return sprintf(buf, "%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n\%d %d %d\n %d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n",
+	return sprintf(buf, "%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n\
+%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n",
 			freq_uv_table[0][0], freq_uv_table[0][1], freq_uv_table[0][2],
 			freq_uv_table[1][0], freq_uv_table[1][1], freq_uv_table[1][2],
 			freq_uv_table[2][0], freq_uv_table[2][1], freq_uv_table[2][2],
@@ -714,30 +715,6 @@ static ssize_t show_bios_limit(struct cpufreq_policy *policy, char *buf)
 			return sprintf(buf, "%u\n", limit);
 	}
 	return sprintf(buf, "%u\n", policy->cpuinfo.max_freq);
-}
-
-static ssize_t show_states_enabled_table(struct cpufreq_policy *policy, char *buf) {
-	return sprintf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
-			enabled_freqs[0], enabled_freqs[1], enabled_freqs[2], enabled_freqs[3],
-			enabled_freqs[4], enabled_freqs[5], enabled_freqs[6], enabled_freqs[7],
-			enabled_freqs[8], enabled_freqs[9], enabled_freqs[10], enabled_freqs[11]);
-
-}
-
-static ssize_t store_states_enabled_table(struct cpufreq_policy *policy, const char *buf, int count) {
-
-	unsigned int ret = -EINVAL;
-
-	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d",
-			&enabled_freqs[0], &enabled_freqs[1], &enabled_freqs[2], &enabled_freqs[3],
-			&enabled_freqs[4], &enabled_freqs[5], &enabled_freqs[6], &enabled_freqs[7],
-			&enabled_freqs[8], &enabled_freqs[9], &enabled_freqs[10], &enabled_freqs[11]);
-	if(ret != NUM_FREQ) {
-		return -EINVAL;
-	}
-	else
-		return count;
-
 }
 
 #ifdef CONFIG_GPU_OC
@@ -784,6 +761,30 @@ static ssize_t store_gpu_clock_table(struct cpufreq_policy *policy, const char *
 
 }
 #endif
+
+static ssize_t show_states_enabled_table(struct cpufreq_policy *policy, char *buf) {
+	return sprintf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d\n",
+			enabled_freqs[0], enabled_freqs[1], enabled_freqs[2], enabled_freqs[3],
+			enabled_freqs[4], enabled_freqs[5], enabled_freqs[6], enabled_freqs[7],
+			enabled_freqs[8], enabled_freqs[9], enabled_freqs[10], enabled_freqs[11]);
+
+}
+
+static ssize_t store_states_enabled_table(struct cpufreq_policy *policy, const char *buf, int count) {
+
+	unsigned int ret = -EINVAL;
+
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d",
+			&enabled_freqs[0], &enabled_freqs[1], &enabled_freqs[2], &enabled_freqs[3],
+			&enabled_freqs[4], &enabled_freqs[5], &enabled_freqs[6], &enabled_freqs[7],
+			&enabled_freqs[8], &enabled_freqs[9], &enabled_freqs[10], &enabled_freqs[11]);
+	if(ret != NUM_FREQ) {
+		return -EINVAL;
+	}
+	else
+		return count;
+
+}
 
 cpufreq_freq_attr_ro_perm(cpuinfo_cur_freq, 0400);
 cpufreq_freq_attr_ro(cpuinfo_min_freq);

@@ -34,14 +34,14 @@ To see full details build your kernel with:
   Building modules, stage 2.
   MODPOST 3 modules
   Kernel: arch/arm/boot/Image is ready
+  GZIP    arch/arm/boot/compressed/piggy.gzip
+  SHIPPED arch/arm/boot/compressed/lib1funcs.S
+  AS      arch/arm/boot/compressed/lib1funcs.o
   CC      drivers/misc/vibetonz/vibrator.mod.o
   CC      drivers/net/wireless/bcm4329/bcm4329.mod.o
   CC      drivers/net/wireless/wimax/cmc7xx_sdio.mod.o
-  GZIP    arch/arm/boot/compressed/piggy.gzip
-  SHIPPED arch/arm/boot/compressed/lib1funcs.S
-  LD [M]  drivers/net/wireless/bcm4329/bcm4329.ko
-  AS      arch/arm/boot/compressed/lib1funcs.o
   LD [M]  drivers/misc/vibetonz/vibrator.ko
+  LD [M]  drivers/net/wireless/bcm4329/bcm4329.ko
   LD [M]  drivers/net/wireless/wimax/cmc7xx_sdio.ko
   AS      arch/arm/boot/compressed/piggy.gzip.o
   LD      arch/arm/boot/compressed/vmlinux

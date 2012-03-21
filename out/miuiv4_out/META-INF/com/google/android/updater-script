@@ -71,6 +71,6 @@ sleep(1);
 	ui_print("");
 	ui_print("KERNEL: SAMURAI");
         ui_print("CODE NAME: MIUI.v4.DAITO");
-        ui_print("COMPILED ON: Sun.Mar.04.2012.06:33:04.PM");
+        ui_print("COMPILED ON: Tue.Mar.20.2012.05:25:09.PM");
 	ui_print("CREATED BY: EarthBound.IAP");
 show_progress(0.100000, 0);

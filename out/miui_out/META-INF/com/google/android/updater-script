@@ -70,7 +70,7 @@ sleep(1);
 
 	ui_print("");
 	ui_print("KERNEL: SAMURAI");
-        ui_print("CODE NAME: MIUI.MTD.TANTO");
-        ui_print("COMPILED ON: Sat.Feb.18.2012.09:31:07.PM");
+        ui_print("CODE NAME: MIUI.MTD.DAITO");
+        ui_print("COMPILED ON: Tue.Mar.20.2012.07:13:11.PM");
 	ui_print("CREATED BY: EarthBound.IAP");
 show_progress(0.100000, 0);

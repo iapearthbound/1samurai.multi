@@ -101,7 +101,7 @@ if [ -e Kernel/bml_mtd ] ; then
       KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
       KERNEL_INITRD="$PWD/initramfs/initramfs_el30"
       BUILD_OUT="$PWD/out/bml_el30_out"
-      BUILD_PLATFORM="CM7.EL30"
+      BUILD_PLATFORM="BML.EL30"
       ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
     #BUILD Layout
       VARIABLES

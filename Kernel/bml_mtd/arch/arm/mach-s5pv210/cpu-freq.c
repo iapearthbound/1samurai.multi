@@ -1049,12 +1049,6 @@ static int __init s5pv210_cpufreq_driver_init(struct cpufreq_policy *policy)
 	previous_arm_volt = (dvs_conf[level].arm_volt - (exp_UV_mV[level] * 1000));
 	freq_uv_table[level][2] = (int)(previous_arm_volt/1000);
 
-#ifdef CONFIG_DEBUG_SHADOWKERNEL
-	printk("FREQ: initialising with vdd %umV for speed %uMHz \n", (previous_arm_volt/1000), (freq_table[level].frequency/1000));
-	printk("FREQ: freq_uv_table[%u][2]: %u,  previous_arm_volt: %u \n",
-					level, freq_uv_table[level][2], previous_arm_volt);
-#endif
-
 #ifdef CONFIG_DVFS_LIMIT
         for(i = 0; i < DVFS_LOCK_TOKEN_NUM; i++)
                 g_dvfslockval[i] = MAX_PERF_LEVEL;
