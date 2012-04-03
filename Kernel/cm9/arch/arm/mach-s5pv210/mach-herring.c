@@ -31,6 +31,9 @@
 #include <linux/input.h>
 #include <linux/irq.h>
 #include <linux/skbuff.h>
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -294,6 +297,13 @@ static struct s3cfb_lcd s6e63m0 = {
 	},
 };
 
+#ifdef CONFIG_S5PV210_BIGMEM
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (5632 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (4608 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (6144 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (33280 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (33280 * SZ_1K)
+#else
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (6144 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (9900 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (6144 * SZ_1K)
@@ -301,7 +311,7 @@ static struct s3cfb_lcd s6e63m0 = {
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (36864 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMD (4800 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (8192 * SZ_1K)
-
+#endif
 static struct s5p_media_device herring_media_devs[] = {
 	[0] = {
 		.id = S5P_MDEV_MFC,
@@ -2030,11 +2040,23 @@ static void k3g_irq_init(void)
 	i2c_devs0[0].irq = (system_rev >= 0x0A) ? IRQ_EINT(29) : -1;
 }
 
+static void fsa9480_charger_cb(bool attached)
+{
+	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
+	if (callbacks && callbacks->set_cable)
+		callbacks->set_cable(callbacks, set_cable_status);
+
+}
+
 
 static void fsa9480_usb_cb(bool attached)
 {
+#ifdef CONFIG_FORCE_FAST_CHARGE
+  if (force_fast_charge != 0) {
+    fsa9480_charger_cb(attached);
+  } else {
+#endif
 	struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
-
 	if (gadget) {
 		if (attached)
 			usb_gadget_vbus_connect(gadget);
@@ -2045,14 +2067,9 @@ static void fsa9480_usb_cb(bool attached)
 	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
 	if (callbacks && callbacks->set_cable)
 		callbacks->set_cable(callbacks, set_cable_status);
+#ifdef CONFIG_FORCE_FAST_CHARGE
 }
-
-static void fsa9480_charger_cb(bool attached)
-{
-	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
-	if (callbacks && callbacks->set_cable)
-		callbacks->set_cable(callbacks, set_cable_status);
-}
+#endif
 
 static struct switch_dev switch_dock = {
 	.name = "dock",

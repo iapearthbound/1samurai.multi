@@ -31,6 +31,8 @@ obj-$(CONFIG_MACH_HERRING)	+= herring-watchdog.o
 obj-$(CONFIG_MACH_HERRING)	+= herring-panel.o
 obj-$(CONFIG_MACH_HERRING)	+= dev-herring-phone.o
 
+obj-$(CONFIG_FORCE_FAST_CHARGE)         += fastchg.o
+
 obj-$(CONFIG_MACH_ARIES)	+= mach-aries.o aries-rfkill.o
 #obj-$(CONFIG_MACH_ARIES)	+= aries-vibrator.o
 obj-$(CONFIG_MACH_ARIES)	+= aries-btlpm.o
