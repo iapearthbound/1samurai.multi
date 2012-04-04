@@ -212,7 +212,7 @@ if [ -e Kernel/cm9 ] ; then
       RECOVERY_INITRD="$PWD/recovery/recovery_cm9"
       KERNEL_INITRD="$KERNEL_BUILD_DIR/usr/initramfs_cm9"
       BUILD_OUT="$PWD/out/cm9_out"
-      BUILD_PLATFORM="CM9.MTD"
+      BUILD_PLATFORM="CM9.OTG"
       ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
     #BUILD Layout
       VARIABLES
