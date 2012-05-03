@@ -175,6 +175,60 @@ else
       INVALID
 fi
 ;;
+  #Compile Kernel for Touch Wiz BML el30
+    "5" )
+if [ -e Kernel/bml_mtd ] ; then
+    #Platform Specific Variables
+      DEFCONFIG_STRING=samurai_bml_el30_defconfig
+      KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
+      KERNEL_INITRD="$PWD/initramfs/initramfs_el30"
+      BUILD_OUT="$PWD/out/bml_fc09_out"
+      BUILD_PLATFORM="BML.FC09"
+      ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
+    #BUILD Layout
+      VARIABLES
+      MAKE_CLEAN
+      #BUILD_MODULE
+      CLEAN_ZIMAGE
+      START_TIME=`date +%s`
+      BUILD_KERNEL
+      UPDATE_CWMSCRIPT
+      PACKAGE_BML_CWMFLASHABLE
+      tput setaf 2
+      read -p "Press [Enter] key to continue..."
+      ./build_kernel.sh
+else
+      INVALID
+fi
+;;
+  #Compile Kernel for Touch Wiz MTD
+    "6" )
+if [ -e Kernel/bml_mtd ] ; then
+    #Platform Specific Variables
+      DEFCONFIG_STRING=samurai_mtd_defconfig
+      KERNEL_BUILD_DIR="$PWD/Kernel/bml_mtd"
+      RECOVERY_INITRD="$PWD/recovery/recovery_mtd"
+      KERNEL_INITRD="$PWD/initramfs/firstStage"
+      BUILD_OUT="$PWD/out/fc09_mtd_out"
+      BUILD_PLATFORM="MTD.FC09"
+      ZIMAGE_ARG="$LOCALVERSION.$BUILD_PLATFORM.$DATE"
+    #BUILD Layout
+      VARIABLES
+      MAKE_CLEAN
+      #BUILD_MODULE
+      CLEAN_ZIMAGE
+      START_TIME=`date +%s`
+      BUILD_KERNEL
+      PACKAGE_BOOTIMG "$KERNEL_PATH" "$KERNEL_INITRD" "$RECOVERY_INITRD"
+      UPDATE_CWMSCRIPT
+      PACKAGE_MTD_CWMFLASHABLE
+      tput setaf 2
+      read -p "Press [Enter] key to continue..."
+      ./build_kernel.sh
+else
+      INVALID
+fi
+;;
   #Compile Kernel for CM7 MTD
     "7" )
 if [ -e Kernel/cm7_miui ] ; then

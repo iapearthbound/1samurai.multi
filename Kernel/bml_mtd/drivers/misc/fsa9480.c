@@ -122,6 +122,10 @@
 #define WIMAX_CABLE_50K       1553
 #define WIMAX_CABLE_50K_DIS   1567
 
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+extern void set_otghost_mode(int mode);
+#endif
+
 struct fsa9480_usbsw {
 	struct i2c_client		*client;
 	struct fsa9480_platform_data	*pdata;
@@ -508,6 +512,16 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw)
 					dev_err(&client->dev,
 						"%s: err %d\n", __func__, ret);
 			}
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+// sztupy: handle automatic otg switching
+                       if (val1 & DEV_USB_OTG) {
+                               // otg cable detected
+                               set_otghost_mode(2);
+                       } else {
+                               // client cable detected
+                               set_otghost_mode(1);
+                       }
+#endif
 #ifdef CONFIG_MACH_VICTORY
 		} else if ( val2 & DEV_T2_USB_MASK ) {
 			if (pdata->wimax_cb)
@@ -584,6 +598,10 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw)
 			UsbIndicator(0);
 			if (pdata->usb_cb)
 				pdata->usb_cb(FSA9480_DETACHED);
+#if defined CONFIG_USB_S3C_OTG_HOST || defined CONFIG_USB_DWC_OTG
+                               // sztupy: also switch off otg host mode
+                               set_otghost_mode(0);
+#endif
 #ifdef CONFIG_MACH_VICTORY		
         	/* USB JIG */
 		} else if (usbsw->dev2 & DEV_T2_USB_MASK) {
@@ -729,13 +747,6 @@ static int __devinit fsa9480_probe(struct i2c_client *client,
 	struct i2c_adapter *adapter = to_i2c_adapter(client->dev.parent);
 	struct fsa9480_usbsw *usbsw;
 	int ret = 0;
-#ifdef CONFIG_MACH_FORTE 
-        s3c_gpio_cfgpin(GPIO_USB_SCL_28V, S3C_GPIO_OUTPUT);
-        s3c_gpio_setpull(GPIO_USB_SCL_28V, S3C_GPIO_PULL_NONE);
-
-        s3c_gpio_cfgpin(GPIO_USB_SDA_28V, S3C_GPIO_OUTPUT);
-        s3c_gpio_setpull(GPIO_USB_SDA_28V, S3C_GPIO_PULL_NONE);
-#endif
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
@@ -780,11 +791,6 @@ static int __devinit fsa9480_probe(struct i2c_client *client,
         indicator_dev.print_state = print_switch_state;
 #endif
         switch_dev_register(&indicator_dev);
-
-#if defined(CONFIG_MACH_VICTORY)
-		ret = switch_dev_register(&wimax_cable);
-		wimax_cable.print_state = wimax_cable_type; 
-#endif
 
 	/* device detection */
 	fsa9480_detect_dev(usbsw);

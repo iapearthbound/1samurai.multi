@@ -80,6 +80,7 @@ enum {
 	AUTH_BATTERY,	// Returns valid result if __VZW_AUTH_CHECK__ is defined.
 	BATT_CHG_CURRENT_AVER,
 	BATT_TYPE,
+	DISABLE_CHARGER,
 #ifdef __SOC_TEST__
 	SOC_TEST,
 #endif
@@ -100,11 +101,7 @@ enum {
 #endif
 };
 
-#ifdef CONFIG_MACH_FORTE
-#define TOTAL_CHARGING_TIME	(5*60*60)	/* 5 hours */
-#else
 #define TOTAL_CHARGING_TIME	(6*60*60)	/* 6 hours */
-#endif
 #define TOTAL_RECHARGING_TIME	  (2*60*60)	/* 2 hours */
 
 #define COMPENSATE_VIBRATOR		19
@@ -130,8 +127,3 @@ enum {
 #define LOW_BATT_COND_VOLTAGE           3400
 #define LOW_BATT_COND_LEVEL             0
 
-#ifdef CONFIG_MACH_FORTE
-#define CHG_CURRENT_COUNT 20
-#else
-#define CHG_CURRENT_COUNT 2
-#endif
